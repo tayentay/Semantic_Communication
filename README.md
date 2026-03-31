@@ -49,5 +49,49 @@ The defaults are illustrative; adjust to match the exact parameters of the targe
 - Computation and communication latency constraints are enforced through iterative updates with subgradient tuning; tighten tolerances or increase iteration budgets for higher fidelity.
 - Piecewise overheads are defined per-GT, enabling heterogeneous semantic graphs.
 
+## Comparison experiments
+
+`experiment.py` reproduces the numerical-results style of the paper, running
+all five schemes (proposed PSCom, no-semantic, satellite-only, UAV-only,
+random) across a range of parametric sweeps and saving publication-ready
+figures to `outputs/experiments/` by default.
+
+**Available experiments**
+
+| Name          | Description |
+|---------------|-------------|
+| `convergence` | Proposed-algorithm convergence curve (objective + per-component energy vs. iteration) |
+| `latency`     | Total energy vs. latency budget $T_{\max}$ |
+| `uav_power`   | Total energy vs. UAV power budget $P_u$ |
+| `sat_power`   | Total energy vs. satellite transmit power $P_s$ |
+| `num_gts`     | Total energy vs. number of ground terminals $K$ |
+| `bar`         | Bar chart comparing all schemes at the default configuration |
+| `summary`     | 2×2 panel combining the four parametric sweeps |
+
+**Quick start**
+
+```bash
+# Run all experiments (saves figures to outputs/experiments/)
+python experiment.py
+
+# Run specific experiments only
+python experiment.py --experiments convergence,bar
+
+# Export sweep tables as CSV alongside figures
+python experiment.py --csv
+
+# Override config or output directory
+python experiment.py --config config/default.yaml --output-dir outputs/paper_figs
+
+# Restrict to a subset of schemes
+python experiment.py --experiments latency --schemes pscom,no_semantic,sat_only
+```
+
+Each parametric-sweep figure shows how the five schemes trade off total energy
+as one system parameter varies while all others are held at their default
+values. The proposed PSCom scheme consistently achieves the lowest energy,
+confirming the effectiveness of joint semantic-compression and UAV-geometry
+optimisation.
+
 ## License
 This implementation is provided for academic experimentation aligned with the referenced paper. Review and adapt parameter choices before deployment in other contexts.
