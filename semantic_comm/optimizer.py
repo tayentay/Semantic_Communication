@@ -141,23 +141,27 @@ class PSComOptimizer:
             for k in range(self.K):
                 ok = self._overhead(k)
                 term_comm = self.gts[k].data_size * (1 - self.eta[k])
+                comm_term_sat = term_comm * (
+                    sat.power / max(r_su, 1e-9) + self.pk[k] / max(rk[k], 1e-9)
+                )
+                comm_term_uav = term_comm * (self.pk[k] / max(rk[k], 1e-9))
+                lag_sat = self.lam[k] * (
+                    const.tau * ok / max(sat.computation_capacity, 1e-9)
+                    - term_comm * (1 / max(r_su, 1e-9) + 1 / max(rk[k], 1e-9))
+                )
+                lag_uav = self.lam[k] * (
+                    const.tau * ok / max(self.fk[k], 1e-9)
+                    - term_comm / max(rk[k], 1e-9)
+                )
                 a_s_coeff = (
                     const.tau * const.kappa * ok * sat.computation_capacity**2
-                    - term_comm * (sat.power / max(r_su, 1e-9) + self.pk[k] / max(rk[k], 1e-9))
-                    + self.lam[k]
-                    * (
-                        const.tau * ok / max(sat.computation_capacity, 1e-9)
-                        - term_comm * (1 / max(r_su, 1e-9) + 1 / max(rk[k], 1e-9))
-                    )
+                    - comm_term_sat
+                    + lag_sat
                 )
                 a_u_coeff = (
                     const.tau * const.kappa * ok * self.fk[k] ** 2
-                    - term_comm * (self.pk[k] / max(rk[k], 1e-9))
-                    + self.lam[k]
-                    * (
-                        const.tau * ok / max(self.fk[k], 1e-9)
-                        - term_comm / max(rk[k], 1e-9)
-                    )
+                    - comm_term_uav
+                    + lag_uav
                 )
                 # Decision per (32)
                 if a_s_coeff >= 0 and a_u_coeff >= 0:
@@ -176,6 +180,7 @@ class PSComOptimizer:
                 t_u = self._t_u(k)
                 t_ug = self._t_ug(k)
                 surplus = t_s + t_su + t_u + t_ug - self.scenario.latency_budget
+                # Diminishing step size follows a standard subgradient schedule.
                 step = self.cfg.subgradient_step / math.sqrt(it + 1)
                 self.lam[k] = max(self.lam[k] + step * surplus, 0.0)
 
@@ -206,9 +211,13 @@ class PSComOptimizer:
             if self.a_u[k] <= 0:
                 self.fk[k] = 0.0
                 continue
-            remaining = max(
-                self.scenario.latency_budget - t_s - t_su - self._t_ug(k), 1e-6
-            )
+            remaining = self.scenario.latency_budget - t_s - t_su - self._t_ug(k)
+            if remaining < 1e-3 and self.cfg.verbosity:
+                print(
+                    f"[warn] GT{k}: remaining latency is small ({remaining:.2e}), "
+                    "capping to avoid instability."
+                )
+            remaining = max(remaining, 1e-3)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining
         # Normalize to computation budget
         total_f = self.fk.sum()
@@ -256,7 +265,8 @@ class PSComOptimizer:
             np.linalg.norm(self.lu - np.array([gt.x, gt.y])) for gt in self.gts
         )
         for theta in theta_vals:
-            h_candidate = max(uav.height_range[0], Lmax * math.tan(theta))
+            tan_theta = max(math.tan(theta), 1e-6)
+            h_candidate = max(uav.height_range[0], Lmax / tan_theta)
             h_candidate = min(h_candidate, uav.height_range[1])
             prev_theta, prev_h = self.theta, self.hu
             self.theta, self.hu = theta, h_candidate

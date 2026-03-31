@@ -20,6 +20,11 @@ class PiecewiseOverhead:
         self.slopes = np.array(self.slopes, dtype=float)
         self.intercepts = np.array(self.intercepts, dtype=float)
         self.boundaries = np.array(self.boundaries, dtype=float)
+        # Expect boundaries in descending order: C_k1 > C_k2 > ... > C_kD
+        order = np.argsort(-self.boundaries)
+        self.boundaries = self.boundaries[order]
+        self.slopes = self.slopes[order]
+        self.intercepts = self.intercepts[order]
 
     @property
     def segments(self) -> int:

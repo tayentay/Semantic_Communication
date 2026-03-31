@@ -58,7 +58,7 @@ ground_terminals:
       boundaries: [0.7, 0.4, 0.2]
 
 simulation:
-  max_outer_iterations: 3
+  max_outer_iterations: 10  # increase for harder scenarios; 10 suffices for this small example
   max_task_allocation_iters: 10
   max_segment_search_iters: 5
   beamwidth_step: 0.05
