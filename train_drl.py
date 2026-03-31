@@ -236,11 +236,12 @@ def main():
                     break
 
         if update % args.track_interval == 0 or update == num_updates:
-            explained_var = (
-                torch.var(b_returns - b_values).item()
-                if torch.var(b_returns).item() > 1e-8
-                else float("nan")
-            )
+            var_returns = torch.var(b_returns)
+            if var_returns.item() > 1e-8:
+                residual = b_returns - b_values
+                explained_var = 1.0 - torch.var(residual).item() / var_returns.item()
+            else:
+                explained_var = float("nan")
             avg_reward = rewards.mean().item()
             print(
                 f"[{run_name}] update {update}/{num_updates} "

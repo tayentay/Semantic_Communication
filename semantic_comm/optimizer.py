@@ -59,7 +59,7 @@ class PSComOptimizer:
     # Utility computations
     # --------------------
     def _step_size(self, iteration: int) -> float:
-        """Diminishing step size 1/sqrt(iter+1) to avoid div-by-zero at iter=0."""
+        """Diminishing step size (subgradient_step)/sqrt(iter+1) to avoid div-by-zero at iter=0."""
         return self.cfg.subgradient_step / math.sqrt(iteration + 1)
 
     def _overhead(self, k: int, eta: float | None = None) -> float:
