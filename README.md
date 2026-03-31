@@ -20,6 +20,12 @@ python run.py --config config/default.yaml
 ```
 The script prints per-iteration energy values and final decisions (semantic compression placement, compression ratios, computation/power/bandwidth allocations, UAV altitude/beamwidth/location).
 
+To visualize the optimization history, enable plotting:
+```bash
+python run.py --config config/default.yaml --plot
+# plot saved to outputs/pscom_history.png by default
+```
+
 ## Configuration
 Edit `config/default.yaml` or provide another YAML file. Key fields:
 - `constants`: Physical constants (e.g., τ, κ, noise PSD, wavelength, beam gains).
