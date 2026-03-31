@@ -19,9 +19,11 @@ class IterationStats:
 
 
 class PSComOptimizer:
+    # Neutral starting compression ratio; 0.8 balances comm/computation before optimization.
     DEFAULT_INITIAL_COMPRESSION_RATIO = 0.8
     MIN_RATE = 1e-9
     MIN_REMAINING_LATENCY = 1e-3
+    MIN_TAN_THETA = 1e-6
 
     def __init__(self, config: SimulationConfig) -> None:
         self.cfg = config
@@ -238,6 +240,7 @@ class PSComOptimizer:
                     )
                 remaining = max(remaining, self.MIN_REMAINING_LATENCY)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining
+            self.fk[k] = min(self.fk[k], self.scenario.uav.computation_capacity)
         # Normalize to computation budget
         total_f = self.fk.sum()
         cap = self.scenario.uav.computation_capacity
@@ -284,7 +287,7 @@ class PSComOptimizer:
             np.linalg.norm(self.lu - np.array([gt.x, gt.y])) for gt in self.gts
         )
         for theta in theta_vals:
-            tan_theta = max(math.tan(theta), 1e-6)
+            tan_theta = max(math.tan(theta), self.MIN_TAN_THETA)
             h_candidate = max(uav.height_range[0], Lmax / tan_theta)
             h_candidate = min(h_candidate, uav.height_range[1])
             prev_theta, prev_h = self.theta, self.hu

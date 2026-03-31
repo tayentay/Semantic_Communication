@@ -25,7 +25,7 @@ def main() -> None:
     cfg = load_config(args.config)
     opt = PSComOptimizer(cfg)
     final, history = opt.run()
-    print("\nFinal objective:", f"{final.objective:.4e}")
+    print("\nFinal objective (energy units):", f"{final.objective:.4e}")
     print("Iterations:", len(history))
     print("a_s:", opt.a_s)
     print("a_u:", opt.a_u)
