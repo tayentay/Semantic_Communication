@@ -67,6 +67,11 @@ SCHEME_STYLES: Dict[str, dict] = {
 
 EXPERIMENTS = ["convergence", "latency", "uav_power", "sat_power", "num_gts", "bar", "summary"]
 
+# Setting convergence_tol below zero guarantees the condition
+#   abs(prev_obj - obj) <= convergence_tol
+# is never satisfied, so the optimizer runs for the full max_outer_iterations.
+_CONVERGENCE_DISABLED = -1.0
+
 
 # ─── Config helpers ───────────────────────────────────────────────────────────
 
@@ -255,31 +260,31 @@ def exp_convergence(cfg: SimulationConfig, output_dir: Path) -> None:
     """
     cfg2 = _silent_copy(cfg)
     cfg2.max_outer_iterations = 20
-    cfg2.convergence_tol = -1.0  # negative → never triggers early stop
+    cfg2.convergence_tol = _CONVERGENCE_DISABLED
 
     opt = PSComOptimizer(cfg2)
     _, history = opt.run()
 
     iters = list(range(1, len(history) + 1))
-    obj  = [s.objective for s in history]
-    e_s  = [s.e_s  for s in history]
-    e_su = [s.e_su for s in history]
-    e_u  = [s.e_u  for s in history]
-    e_ug = [s.e_ug for s in history]
+    total_energy        = [s.objective for s in history]
+    sat_comp_energy     = [s.e_s  for s in history]
+    sat_trans_energy    = [s.e_su for s in history]
+    uav_comp_energy     = [s.e_u  for s in history]
+    uav_trans_energy    = [s.e_ug for s in history]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
-    ax1.plot(iters, obj, marker="o", linewidth=2, color="tab:blue", label="Total Energy")
+    ax1.plot(iters, total_energy, marker="o", linewidth=2, color="tab:blue", label="Total Energy")
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("Total Energy (J)")
     ax1.set_title("Convergence of Proposed Algorithm")
     ax1.legend()
     ax1.grid(True, alpha=0.3)
 
-    ax2.plot(iters, e_s,  marker="s", label=r"$E_s$ (Sat. Comp.)")
-    ax2.plot(iters, e_su, marker="^", label=r"$E_{su}$ (Sat. Trans.)")
-    ax2.plot(iters, e_u,  marker="D", label=r"$E_u$ (UAV Comp.)")
-    ax2.plot(iters, e_ug, marker="x", label=r"$E_{ug}$ (UAV Trans.)")
+    ax2.plot(iters, sat_comp_energy,  marker="s", label=r"$E_s$ (Sat. Comp.)")
+    ax2.plot(iters, sat_trans_energy, marker="^", label=r"$E_{su}$ (Sat. Trans.)")
+    ax2.plot(iters, uav_comp_energy,  marker="D", label=r"$E_u$ (UAV Comp.)")
+    ax2.plot(iters, uav_trans_energy, marker="x", label=r"$E_{ug}$ (UAV Trans.)")
     ax2.set_xlabel("Iteration")
     ax2.set_ylabel("Energy Component (J)")
     ax2.set_title("Energy Components vs. Iteration")
