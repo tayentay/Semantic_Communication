@@ -29,6 +29,11 @@ class PSComOptimizer:
         self.K = self.scenario.num_gts
         self.gts: List[GroundTerminal] = self.scenario.gt_positions
         self.logger = logging.getLogger(__name__)
+        if not self.logger.handlers:
+            logging.basicConfig(
+                level=logging.INFO if self.cfg.verbosity else logging.WARNING
+            )
+        self.logger.setLevel(logging.INFO if self.cfg.verbosity else logging.WARNING)
 
         # Decision variables (initialized with reasonable defaults)
         self.a_s = np.ones(self.K)  # semantic compression at satellite
@@ -228,9 +233,8 @@ class PSComOptimizer:
             if remaining < self.MIN_REMAINING_LATENCY:
                 if self.cfg.verbosity:
                     self.logger.warning(
-                        "GT%s: remaining latency is small (%.2e); capping to avoid instability.",
-                        k,
-                        remaining,
+                        f"GT{k}: remaining latency is small ({remaining:.2e}); "
+                        "capping to avoid instability."
                     )
                 remaining = max(remaining, self.MIN_REMAINING_LATENCY)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining
@@ -342,10 +346,14 @@ class PSComOptimizer:
             stats = self.iterate()
             history.append(stats)
             if self.cfg.verbosity:
-                print(
-                    f"[Iter {i+1}] obj={stats.objective:.4e} "
-                    f"(e_s={stats.e_s:.3e}, e_su={stats.e_su:.3e}, "
-                    f"e_u={stats.e_u:.3e}, e_ug={stats.e_ug:.3e})"
+                self.logger.info(
+                    "[Iter %s] obj=%.4e (e_s=%.3e, e_su=%.3e, e_u=%.3e, e_ug=%.3e)",
+                    i + 1,
+                    stats.objective,
+                    stats.e_s,
+                    stats.e_su,
+                    stats.e_u,
+                    stats.e_ug,
                 )
             if abs(prev_obj - stats.objective) <= self.cfg.convergence_tol:
                 break
