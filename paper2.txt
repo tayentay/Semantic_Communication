@@ -1,0 +1,3948 @@
+8814
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+Energy-Efﬁcient Probabilistic Semantic
+Communication Over Space-Air-Ground
+Integrated Networks
+
+Zhouxiang Zhao , Graduate Student Member, IEEE, Zhaohui Yang , Member, IEEE,
+Mingzhe Chen , Senior Member, IEEE, Chen Zhu , Wei Xu , Fellow, IEEE,
+Zhaoyang Zhang , Senior Member, IEEE, and Kaibin Huang , Fellow, IEEE
+
+Abstract—Space-air-ground integrated networks (SAGINs) are
+emerging as a pivotal element in the evolution of future wireless
+networks. Despite their potential, the joint design of communi-
+cation and computation within SAGINs remains a formidable
+challenge. In this paper, the problem of energy efﬁciency in
+SAGIN-enabled probabilistic semantic communication (PSCom)
+system is investigated. In the considered model, a satellite
+needs to transmit data to multiple ground terminals (GTs)
+via an uncrewed aerial vehicle (UAV) acting as a relay. Dur-
+ing transmission, the satellite and the UAV can use PSCom
+technique to compress the transmitting data, while the GTs
+can automatically recover the missing information. The PSCom
+is underpinned by shared probabilistic graphs that serve as
+a common knowledge base among the transceivers, allowing
+for resource-saving communication at the expense of increased
+computation resource. Through analysis, the computation over-
+head function in PSCom is a piecewise function with respect
+
+Received 27 November 2024; revised 24 March 2025; accepted 3 May
+2025. Date of publication 19 May 2025; date of current version 14 October
+2025. This work was supported in part by the National Key Research and
+Development Program of China under Grant 2023YFB2904804; in part by
+the Young Elite Scientists Sponsorship Program by China Association for
+Science and Technology (CAST) under Grant 2023QNRC001; in part by
+Zhejiang Key Research and Development Program under Grant 2023C01021;
+in part by the Fundamental Research Funds for the Central Universities
+under Grant K2023QA0AL02; in part by the Research Grants Council (RGC)
+of Hong Kong Special Administrative Region, China, under a Fellowship
+Award under Grant HKU RFS2122-7S04; in part by NSFC/RGC Collaborative
+Research Scheme (CRS) under Grant CRS HKU702/24; in part by the Areas
+of Excellence Scheme Grant AoE/E-601/22-R; in part by the Collaborative
+Research Fund under Grant C1009-22G and Grant 17212423; and in part
+by Shenzhen-Hong Kong-Macau Technology Research Programme (Type C)
+under Grant SGDX20230821091559018. The associate editor coordinating
+the review of this article and approving it for publication was A. Schmeink.
+(Corresponding author: Zhaohui Yang.)
+
+Zhouxiang Zhao, Zhaohui Yang, and Zhaoyang Zhang are with the
+College of Information Science and Electronic Engineering, Zhejiang Uni-
+versity, Hangzhou 310027, China, and also with Zhejiang Provincial Key
+Laboratory of
+Information Processing, Communication and Networking
+(IPCAN), Hangzhou 310027, China (e-mail: zhouxiangzhao@zju.edu.cn;
+yang zhaohui@zju.edu.cn; ning ming@zju.edu.cn).
+
+Mingzhe Chen is with the Department of Electrical and Computer Engineer-
+ing and the Institute for Data Science and Computing, University of Miami,
+Coral Gables, FL 33146 USA (e-mail: mingzhe.chen@miami.edu).
+
+Chen Zhu is with the Polytechnic Institute, Zhejiang University,
+Hangzhou 310015, China, and also with the School of Communication
+Engineering, Hangzhou Dianzi University, Hangzhou 310018, China (e-mail:
+zhuc@zju.edu.cn).
+
+Wei Xu is with the National Mobile Communications Research Laboratory,
+
+Southeast University, Nanjing 211189, China (e-mail: wxu@seu.edu.cn).
+
+Kaibin Huang is with the Department of Electrical and Electronic Engi-
+neering, The University of Hong Kong, Hong Kong, SAR, China (e-mail:
+huangkb@eee.hku.hk).
+
+Digital Object Identiﬁer 10.1109/TWC.2025.3569102
+
+to the semantic compression ratio. Therefore, it is important
+to make a balance between communication and computation to
+achieve optimal energy efﬁciency. The joint communication and
+computation problem is formulated as an optimization problem
+aiming to minimize the total communication and computation
+energy consumption of the network under latency, power, com-
+putation capacity, bandwidth, semantic compression ratio, and
+UAV location constraints. To solve this non-convex non-smooth
+problem, we propose an iterative algorithm where the closed-
+form solutions for computation capacity allocation and UAV
+altitude are obtained at each iteration. Numerical results show
+the effectiveness of the proposed algorithm.
+
+Index Terms—Space-air-ground integrated network, semantic
+
+communication, energy efﬁciency, computation ofﬂoading.
+
+I. INTRODUCTION
+
+technology,
+
+aerial vehicle (UAV)
+
+W ITH rapid advancements in satellite and uncrewed
+
+the potential of
+space-air-ground integrated networks (SAGINs) to revolution-
+ize future communication systems is becoming increasingly
+evident [1], [2], [3]. SAGIN covers satellites, aerial platforms,
+and terrestrial nodes, making it a multi-level three-dimensional
+(3D) network [4]. This 3D characteristic gives SAGINs global
+broadband coverage, which is a major demand in the sixth-
+generation (6G) wireless networks [5]. Beyond traditional
+wireless connectivity, 6G is envisioned to provide advanced
+computing services, enabling intelligent and efﬁcient data
+processing [6], [7]. Among these innovations, semantic com-
+munication has gained signiﬁcant attention as a paradigm that
+transcends conventional bit-based transmission [8], [9], [10].
+In semantic communication, the transmitter extracts seman-
+tic information from raw data before transmission, allowing
+the receiver to reconstruct the message with minimal data
+exchange [11]. While this approach enhances communication
+efﬁciency by reducing the amount of data transmitted, it also
+introduces additional computation overhead, which requires
+a joint communication and computation design [12]. Despite
+extensive research on satellite and UAV communication, inte-
+grated networks across space-air-ground present signiﬁcant
+challenges in balancing communication and computation [13],
+[14], necessitating innovative design strategies.
+
+A. Related Works
+
+1) SAGINs: Existing studies on SAGINs have primarily
+
+focused on network architecture and resource management.
+
+1536-1276 © 2025 IEEE. All rights reserved, including rights for text and data mining, and training of artiﬁcial intelligence and
+similar technologies. Personal use is permitted, but republication/redistribution requires IEEE permission.
+See https://www.ieee.org/publications/rights/index.html for more information.
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8815
+
+Hierarchical architectures have been explored to enable
+efﬁcient coordination among space, air, and ground seg-
+ments in SAGINs. For instance, [15] proposed a ﬂexible,
+low-latency, and ﬂat SAGIN architecture, demonstrating its
+advantages in reducing delay and enhancing ﬂexibility through
+two deployment scenarios. Building on this, [16] introduced
+software-deﬁned network (SDN) into SAGIN, designing a
+hierarchical domain-based architecture with a multi-controller
+deployment strategy to enhance network adaptability. In addi-
+tion, [17] explored the integration of mobile edge computing
+(MEC) with SAGIN, examining the system architecture,
+selection schemes, and handover procedures to combine com-
+munication, sensing, and computing.
+
+Resource management in SAGINs is another crucial aspect.
+[18] developed a scalable task scheduling and resource alloca-
+tion framework, designed to handle diverse task scenarios and
+manage heterogeneous task demands efﬁciently. To improve
+computing resource utilization in the internet of vehicles (IoV),
+[19] proposed an edge-cloud architecture based on SDN and
+network function virtualization, which enhances network ﬂexi-
+bility and computing efﬁciency. Additionally, [20] investigated
+the use of wireless edge caching to improve quality of service
+(QoS) and quality of experience (QoE), utilizing relay nodes
+in SAGINs to pre-cache frequently accessed tasks and reduce
+transmission delays.
+
+Despite these advances,
+
+the aforementioned works all
+used conventional communication schemes. The integration
+of semantic communication and SAGINs offers a promising
+avenue to further enhance efﬁciency by reducing redundant
+data transmission while introducing new challenges in com-
+putation resource allocation.
+
+2) Semantic Communications: Semantic communication is
+an emerging paradigm that extends beyond traditional bit
+transmission by prioritizing the conveyance of message mean-
+ing rather than raw data streams [21], [22], [23]. By leveraging
+it effectively
+advancements in artiﬁcial
+extracts essential information, signiﬁcantly reducing data size
+by eliminating redundancies [24], [25], [26]. This approach
+enhances energy efﬁciency, spectral efﬁciency, and overall
+communication reliability [27], [28].
+
+intelligence (AI),
+
+A fundamental aspect of semantic communication is seman-
+tic information representation. In joint source-channel coding
+(JSCC) schemes, deep neural networks generate seman-
+transmitted data [29]. Some other
+tic representations of
+approaches utilize knowledge graphs or semantic triplets to
+structure semantic information [30], [31], [32]. Based on
+the statistical
+information of extensive knowledge graphs,
+probabilistic semantic communication (PSCom) employs prob-
+abilistic graphs as knowledge bases to enhance semantic
+compression [33]. Building upon this, [34] integrated rate-
+splitting multiple access (RSMA) into PSCom and formulated
+an energy minimization problem. Incorporating distributed
+reconﬁgurable intelligent surfaces (RISs), [35] explored spec-
+tral efﬁciency maximization for PSCom while considering
+computational constraints.
+
+In PSCom, semantic information is compressed using
+probabilistic graphs, effectively reducing redundancy. In this
+context, redundancy refers to messages that can be inferred
+
+from the shared probabilistic graph. Furthermore, the com-
+putation overhead of PSCom can be mathematically modeled
+as a piecewise function, thus facilitating the joint design of
+communication and computation processes.
+
+B. Motivation and Contributions
+
+In SAGINs, communication resources are signiﬁcantly
+more constrained than in terrestrial networks due to limited
+spectrum availability, long propagation delays, etc. Semantic
+communication offers a promising solution by reducing data
+transmission requirements through intelligent compression,
+thereby conserving scarce communication resources. However,
+this comes at the cost of increased computation overhead, as
+semantic information extraction demand substantial processing
+power. The multi-layered structure of SAGINs further compli-
+cates this trade-off, as computation tasks must be strategically
+allocated between satellites and UAVs, each with varying
+processing capabilities and energy constraints [36]. Effectively
+integrating PSCom into SAGINs requires a joint optimization
+of communication and computation, balancing data compres-
+sion beneﬁts against computational feasibility while ensuring
+efﬁcient resource allocation across different network layers.
+
+This paper proposes a SAGIN-enabled PSCom framework
+that combines the beneﬁts of SAGIN and semantic communi-
+cation. To the best of our knowledge, this is the ﬁrst work
+that examines semantic communication resource allocation
+problem in SAGINs. The key contributions are summarized
+as follows:
+
+• We propose a SAGIN-enabled PSCom framework in
+which a satellite transmits data to multiple ground ter-
+minals (GTs) via a UAV acting as a relay. During the
+transmission, the satellite and the UAV can choose to
+perform semantic compression to reduce the data size of
+the message using PSCom technique, while the GTs can
+reconstruct the compressed information using the shared
+probabilistic graphs. Although this semantic compression
+can save communication resource, it inevitably incurs
+additional computation costs. The computation overhead
+function in PSCom system is modeled as a piecewise
+function with respect to the semantic compression ratio.
+Thus, a trade-off between communication and computa-
+tion is required to achieve optimal performance.
+
+• We formulate a joint communication and computation
+optimization problem aimed at minimizing the total
+energy consumption of the system, encompassing both
+communication and computation components. This is
+achieved by optimizing key system parameters, including
+the UAV’s location and beamwidth,
+the allocation of
+bandwidth, computation capacity, and transmit power for
+each GT on the UAV, the semantic compression ratio,
+and the allocation of computation tasks between the
+satellite and the UAV. The optimization problem is subject
+to constraints on latency, power budgets, computation
+capacity, bandwidth availability, semantic compression
+ratios, and UAV positioning.
+
+• This optimization problem exhibits a pronounced non-
+convex structure, further complicated by the introduction
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8816
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+TABLE I
+LIST OF MAIN NOTATIONS
+
+Fig. 1.
+
+Illustration of the considered SAGIN-enabled PSCom system.
+
+and the data that need to be transmitted to GT k is denoted
+by Dk. Due to limited wireless resources, the satellite or UAV
+needs to take advantage of its computation capability to extract
+the small-sized semantic information Ck from original data Dk
+to reduce data size, thus saving communication resources. In
+the considered model, semantic communication is enabled by
+shared probabilistic graphs between the satellite, UAV, and
+GTs.
+
+A. Semantic Communication Model
+
+In the considered PSCom model, we assume the transmitter
+has a set of semantic triplets [32] to transmit. A semantic
+triplet is deﬁned as
+
+ε = (h, r, t),
+
+(1)
+
+where h is the head entity, t is the tail entity, and r represents
+the relation between them. For example, (Tree, on, Grass) is
+a semantic triplet with “Tree” as the head entity, “Grass” as
+the tail entity, and “on” as the relation. These triplets can be
+generated from diverse data types (text, images, video) using
+deep neural networks [37], [38], [39]. As shown, semantic
+triplets provide high information density, encoding a large
+amount of data with a small number of bits. Despite their
+compactness, we propose a probabilistic approach to compress
+them further.
+
+In traditional semantic triplets, the relation is ﬁxed. How-
+ever, with a large set of
+triplets, we can generate a
+probabilistic graph to store their statistical information. These
+triplets, derived from historical data between transceivers,
+form semantic quadruples, which extend the traditional triplet
+by incorporating the relation probability. The probabilistic
+graph, as shown in Fig. 2, is shared between transceivers,
+serving as a knowledge base. The transmitter can then use
+this graph for semantic compression when sending triplets
+to the receiver [40]. A multi-dimensional conditional prob-
+ability matrix is computed from the graph,
+indicating the
+likelihood of a speciﬁc triplet being valid when others are
+valid. This allows omitting the relation before transmission,
+reducing data size. Upon receiving the compressed data, the
+
+of the piecewise function that induces non-smooth char-
+acteristics. To address this challenging non-convex and
+non-smooth optimization problem, we propose an itera-
+tive algorithm that alternately optimizes six subproblems.
+At each iteration, closed-form solutions are derived
+for computation capacity allocation and UAV altitude.
+Numerical results show the effectiveness of the proposed
+algorithm.
+
+C. Organization and Notations
+
+The remainder of this paper is organized as follows. Sec-
+tion II introduces the system model, detailing the architecture
+of the considered SAGIN and the PSCom framework, then
+formulates the energy efﬁciency optimization problem. Sec-
+tion III presents the proposed iterative algorithm, including the
+detailed derivation and algorithm analysis on convergence and
+complexity. Section IV provides a comprehensive analysis of
+the simulation results, demonstrating the effectiveness of the
+proposed algorithm in achieving energy-efﬁcient PSCom over
+SAGINs. Finally, Section V concludes the paper.
+
+The main notations used in the paper are summarized in
+
+Table I.
+
+II. SYSTEM MODEL AND PROBLEM FORMULATION
+
+Consider a downlink transmission scenario that a satellite
+in the space needs to transmit data to multiple GTs on the
+ground and uses a UAV in the air as a relay, as shown in
+Fig. 1. The set of GTs is represented by K = {1, 2, · · · , K},
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8817
+
+Fig. 2. An illustration of a probabilistic graph in the PSCom system.
+
+receiver can recover the omitted relation using the shared
+probabilistic graph. For instance, if the transmitter needs to
+send (Tree, behind, Building), it only needs to transmit (Tree,
+∅, Building), omitting the relation. The receiver can then
+recover the relation “behind” based on the shared graph, as
+it has a high probability. However, achieving greater data
+compression requires a lower semantic compression ratio,
+which involves higher-dimensional conditional probabilities.
+This leads to increased computation overhead, highlighting
+the trade-off between communication and computation in the
+PSCom system.
+
+In the SAGIN-enabled PSCom framework, each GT main-
+tains a local probabilistic graph with statistical data from its
+history. These graphs are shared with the satellite and UAV.
+The satellite holds data Dk for GT k, which may consist
+of remote sensing results in the form of semantic triplets.
+Using PSCom, the satellite or UAV can perform semantic
+compression on Dk. Upon receiving the compressed data Ck,
+GT k can recover the missing information using the shared
+graph. The semantic compression ratio for GT k is deﬁned as
+
+ρk =
+
+Ck
+Dk
+
+,
+
+(2)
+
+where Dk is the original data size and Ck is the compressed
+size. A lower ratio indicates more compact compression.
+
+B. Computation Model
+
+The PSCom technique can save communication resources
+this process
+
+through semantic
+inevitably costs additional computation resources.
+
+compression. However,
+
+According to equation (20) in [33], the computation over-
+head for the considered PSCom technique can be written as
+
+Fig. 3.
+and computation overhead.
+
+Illustration of the relationship between semantic compression ratio
+
+where Akd < 0 denotes the slope, Bkd > 0 represents the
+term, and Ckd stands for the boundary for each
+constant
+segment d ∈ Ds = {1, · · · , D}. These parameters depend
+on the properties of the probabilistic graph corresponding to
+different GTs.
+
+From equation (3), we observe that the computation over-
+head for GT k, denoted by Ok(ρk), manifests as a piecewise
+function with respect to its semantic compression ratio, ρk.
+Fig. 3 visually depicts the behavior of the Ok(ρk) function.
+This function exhibits a segmented structure with D distinct
+levels, a property that is determined by the dimensionality of
+the conditional probabilities. This segmentation arises from the
+inherent characteristic of the semantic compression process,
+which employs multiple hierarchical
+levels of conditional
+probabilities. Each level contributes a distinct linear expres-
+sion to the overall computation overhead. Furthermore, a
+discernible decrease in the slope magnitude of Ok(ρk) is
+evident across these discrete segments. This phenomenon can
+be attributed to the utilization of lower-dimensional condi-
+tional probabilities at higher semantic compression ratios,
+resulting in reduced computation demands. On the contrary,
+as ρk diminishes, the need for higher-dimensional information
+arises. Consequently,
+the computation overhead intensiﬁes
+with increasing information dimensionality. Each transition
+within the piecewise function Ok(ρk) signiﬁes the activation
+of a higher level of probabilistic information.
+
+C. Network Model
+
+In the considered SAGIN-enabled PSCom system, there is
+one satellite, one UAV, and K GTs. The satellite and the UAV
+are equipped with computation capacity and are shared with
+probabilistic graphs of all GTs. The UAV can hover in the air.
+Fig. 4 illustrates the considered network.
+
+In the ground network, the horizontal and vertical location
+
+of GT k can be denoted by
+
+k = (cid:0)xG
+LG
+
+k , yG
+k
+
+(cid:1) ,
+
+(4)
+
+Ok (ρk) =
+
+
+
+Ck1 < ρk ≤ 1,
+Ck2 < ρk ≤ Ck1,
+
+Ak1ρk + Bk1,
+
+Ak2ρk + Bk2,
+...
+
+AkDρk + BkD, CkD ≤ ρk ≤ Ck(D−1),
+
+and the height of each GT is approximated to be zero com-
+pared to the height of UAV and satellite.
+
+In the air network, the horizontal and vertical location of
+
+the UAV can be denoted by
+
+(3)
+
+LU = (cid:0)xU, yU(cid:1) ,
+
+(5)
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8818
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+simpliﬁcation, we model the satellite-to-UAV wireless channel
+coefﬁcient as
+√
+δSλSU
+4πdSU ,
+
+|hSU| =
+
+(8)
+
+where δS is the beam gain, and λSU denotes the wavelength
+of the satellite-to-UAV transmission wave.
+
+Consequently, the downlink transmission rate between the
+
+satellite and the UAV can be given by
+
+(cid:32)
+
+rSU = BSU log2
+
+1 +
+
+|hSU|2 PS
+BSUN0
+
+(cid:33)
+
+,
+
+(9)
+
+where BSU denotes the bandwidth of the satellite-to-UAV
+system, PS represents the transmit power of the satellite, and
+N0 is the power spectral density of additive white Gaussian
+noise (AWGN).
+
+2) UAV to GT: We assume that the UAV is outﬁtted with a
+directional antenna featuring adjustable beamwidth, while each
+GT is equipped with an omnidirectional antenna possessing
+unit gain. The azimuth and elevation half-power beamwidths
+of the UAV’s antenna are equivalent and are denoted by
+2Θ ∈ (0, π). Conforming to [[41], Eqs. (2)–(52)], the antenna
+gain within the azimuth angle θ and elevation angle φ can be
+expressed as
+
+G =
+
+
+
+
+
+
+G0
+Θ2 ,
+g,
+
+if 0 ≤ θ ≤ Θand 0 ≤ φ ≤ Θ,
+
+(10)
+
+otherwise,
+
+where G0 ≈ 2.2846, and g ≈ 0 represents the antenna gain
+outside the beamwidth.
+
+In the considered scenario, the GTs are positioned in out-
+door environments, and the communication channels between
+the UAV and each GT are dominated by the line-of-sight (LoS)
+path. Consequently, the channel gain between the UAV and GT
+k can be expressed as1
+
+gk =
+
+g0
+(cid:0)dUG
+
+k
+
+(cid:1)2 ,
+
+(11)
+
+where g0 denotes the channel gain at the reference distance of
+1 m.
+
+To ensure effective communication between the UAV and
+the GTs, all GTs must be within the coverage area of the UAV,
+which means
+
+(cid:13)
+(cid:13)LU − LG
+k
+
+(cid:13)
+(cid:13) ≤ HU tan Θ, ∀k ∈ K.
+
+(12)
+
+We employ frequency-division multiple access (FDMA) for
+then the achievable downlink
+UAV-to-GT communication,
+transmission rate for GT k satisfying constraint (12) can be
+written as
+
+rk = bk log2
+
+1 +
+
+(cid:18)
+
+(cid:19)
+
+G0gkpk
+Θ2bkN0
+
+,
+
+(13)
+
+where bk is the allocated bandwidth for GT k, and pk is the
+allocated transmit power for GT k.
+
+1For simpliﬁcation, we consider the GTs are located outdoors within rural
+areas where the pathloss exponent is 2, and we assume that communication
+via sidelobes is negligible.
+
+Fig. 4. The considered SAGIN-enabled PSCom network.
+
+and the height of the UAV is represented by HU. Therefore,
+the distance between the UAV and GT k can be calculated as
+
+dUG
+k =
+
+(cid:16)(cid:13)
+(cid:13)LU − LG
+k
+
+(cid:13)
+2
+(cid:13)
+
++ H 2
+U
+
+(cid:17) 1
+
+2
+
+,
+
+(6)
+
+where (cid:107)·(cid:107) is the Euclidian norm.
+
+In the space network, the distance between the satellite and
+the UAV is denoted as dSU. Given the satellite’s signiﬁcantly
+high altitude, variations in the UAV’s position exert minimal
+inﬂuence on dSU. For analytical simplicity, the impact of the
+UAV’s positional changes on the satellite-UAV distance is
+therefore neglected. Furthermore, although satellites are inher-
+ently mobile, their orbital periods are substantially longer than
+the transmission timescale under consideration. Consequently,
+the satellite’s orbit is approximated as quasi-static during the
+data transmission phase, simplifying the analysis.
+
+The satellite transmits data to GT k indirectly with the UAV
+as a relay. During the transmission process, the satellite or
+UAV can choose to perform semantic compression using the
+PSCom technique to reduce the consumption of communica-
+tion resources. We use aS
+k to indicate the computation state
+of the satellite. If the satellite does the semantic compression
+for GT k, we have aS
+k = 0.
+Similarly, we use aU
+k to indicate the computation state of the
+UAV. Since the semantic compression for each GT is required
+at most once, the following constraint can be obtained:
+k + aU
+aS
+
+k = 1; otherwise, we have aS
+
+k ≤ 1,
+
+(7)
+
+which indicates that the semantic compression for each GT is
+either conducted by the satellite, by the UAV, or by neither of
+them.
+
+D. Transmission Model
+
+In the considered downlink transmission scenario, the satel-
+lite sends data to the UAV, which then sends data to the GTs.
+1) Satellite to UAV: Different from traditional terrestrial
+communication, the satellite communication channel is subject
+to various factors, including space propagation fading, atmo-
+spheric absorption fading, rain attenuation, among others. For
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8819
+
+E. Latency and Energy Model
+
+Latency and energy efﬁciency are both important metrics in
+communication systems, particularly in SAGINs. SAGINs are
+characterized by exceptionally long communication distances,
+which require great attention to latency. Additionally,
+the
+resource-constrained nature of SAGINs highlights the impor-
+tance of energy efﬁciency.
+
+1) Satellite to UAV: The computation latency caused by
+
+satellite computation can be modeled as
+
+tS =
+
+κ (cid:80)K
+
+k=1 aS
+FS
+
+kOk(ρk)
+
+,
+
+(14)
+
+where κ is a constant, and FS denotes the computation
+capacity of the satellite.
+
+Then, the computation energy cost by the satellite can be
+
+written as
+
+eS = τ tSF 3
+S ,
+
+(15)
+
+where τ is a constant.
+
+The communication latency of the satellite-to-UAV link is
+comprised of transmission delay and propagation delay. The
+propagation delay cannot be neglected since the vast distance
+between the satellite and the UAV, often spanning thousands
+of kilometers.
+
+Fig. 5. The framework of the considered SAGIN-enabled PSCom network.
+
+Then, the communication latency from the UAV to GT k
+
+that is in coverage can be expressed as
+(cid:1) ρkDk + (cid:0)1 − aS
+rk
+
+k + aU
+k
+
+tUG
+k =
+
+(cid:0)aS
+
+k − aU
+k
+
+(cid:1) Dk
+
+.
+
+(22)
+
+Afterwards, the total UAV-to-GT communication energy can
+
+The transmission delay of the satellite-to-UAV communica-
+
+be calculated as
+
+tion can be expressed as
+
+(cid:80)K
+
+k=1
+
+tT =
+
+(cid:2)aS
+
+kCk + (cid:0)1 − aS
+rSU
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
+,
+
+(16)
+
+which is data size over transmission rate. The propagation
+delay of the satellite-to-UAV communication can be expressed
+as
+
+tP =
+
+,
+
+(17)
+
+dSU
+c
+
+where c is the speed of light. Then, the total communication
+latency of the satellite-to-UAV communication can be written
+as
+
+tSU = tT + tP.
+
+(18)
+
+Afterwards, the satellite-to-UAV communication energy can
+
+be calculated as
+
+eUG =
+
+K
+(cid:88)
+
+k=1
+
+tUG
+k pk.
+
+(23)
+
+The general framework of the considered SAGIN-enabled
+
+PSCom network is illustrated in Fig. 5.
+
+F. Problem Formulation
+
+Given the deﬁned system model, our goal is to minimize the
+energy consumption of the SAGIN-enabled PSCom network
+while considering latency requirement, power budget and suit-
+able location of the UAV, bandwidth and computation capacity
+allocation of the UAV, semantic compression ratio for each GT,
+and computation task allocation between the satellite and the
+UAV. Mathematically, the energy minimization problem can
+be formulated as
+
+eSU = tTPS.
+
+(19)
+
+min
+LU,HU,Θ,b,f ,p,ρ,aS,aU
+
+eS + eSU + eU + eUG,
+
+(24)
+
+2) UAV to GT: The computation latency caused by UAV
+
+computation for GT k can be modeled as
+
+s.t.
+
+tU
+k =
+
+κaU
+
+k Ok(ρk)
+fk
+
+,
+
+(20)
+
+where fk denotes the computation capacity of the UAV that
+is allocated for GT k.
+
+Then, the total computation energy cost by the UAV can be
+
+written as
+
+eU = τ
+
+K
+(cid:88)
+
+k=1
+
+k f 3
+tU
+k .
+
+(21)
+
+As the distance between the UAV and each GT is only
+a few hundred meters, the propagation delay in UAV-to-GT
+communication can be neglected.
+
+k + tUG
+
+k ≤ T, ∀k ∈ K,
+
+tS + tSU + tU
+K
+(cid:88)
+
+pk ≤ PU,
+
+(cid:13)
+(cid:13) ≤ HU tan Θ, ∀k ∈ K,
+
+k=1
+(cid:13)
+(cid:13)LU − LG
+k
+U ≤ HU ≤ H max
+H min
+U ,
+K
+(cid:88)
+
+bk ≤ BU,
+
+k=1
+K
+(cid:88)
+
+fk ≤ FU,
+
+k=1
+ρmin
+k ≤ ρk ≤ 1, ∀k ∈ K,
+k + aU
+aS
+
+k ≤ 1, ∀k ∈ K,
+
+(24a)
+
+(24b)
+
+(24c)
+
+(24d)
+
+(24e)
+
+(24f)
+
+(24g)
+
+(24h)
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8820
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+k ∈ {0, 1} , ∀k ∈ K,
+
+aS
+k, aU
+Θmin ≤ Θ ≤ Θmax,
+bk, fk, pk ≥ 0, ∀k ∈ K,
+
+s.t.
+
+(24i)
+
+(24j)
+
+(24k)
+
+U
+
+1, · · · , aS
+K
+
+1 , · · · , aU
+K
+
+U , H max
+
+f = [f1, · · · , fK]T, p =
+where b = [b1, · · · , bK]T,
+[p1, · · · , pK]T, ρ = [ρ1, · · · , ρK]T, aS = (cid:2)aS
+(cid:3)T
+,
+and aU = (cid:2)aU
+(cid:3)T
+. Here, T is the maximum tolerable
+latency of each GT, PU is the total power budget of the
+UAV, (cid:2)H min
+(cid:3) is the feasible altitude range of the
+UAV, constrained by both obstacle heights and regulatory
+limitations, BU is the total bandwidth of the UAV, FU is
+the total computation capacity of the UAV, ρmin
+is the min-
+imum achievable semantic compression ratio of GT k, and
+[Θmin, Θmax] is the feasible range of half-beamwidth for the
+UAV’s antenna, as determined by practical antenna beamwidth
+tuning techniques.
+
+k
+
+In problem (24), constraint (24a) requires that the SAGIN-
+enabled PSCom network cannot have a latency exceeding
+T for all GTs. This necessitates a careful trade-off between
+communication and computation, and a strategic allocation
+of computational tasks between the satellite and the UAV.
+Constraints (24b), (24e), and (24f) impose limitations on the
+total power, bandwidth, and computation capacity resources
+allocated for each GT. Constraints (24c), (24d), and (24j)
+limit the location of the UAV and the half-beamwidth of
+its antenna. Constraint (24g) determines the range of the
+semantic compression ratio of each GT. Constraints (24h)
+and (24i) govern the allocation of computation tasks between
+the satellite and the UAV. Finally, constraint (24k) guarantees
+the non-negativity of bandwidth, computation capacity, and
+transmit power.
+
+It
+
+is generally hard to solve problem (24) since both
+the objective function and constraint (24a) are non-convex.
+Additionally, the integer constraint (24i) and the presence of
+the piecewise function Ok(ρk) further complicate the opti-
+mization process. To address these challenges and achieve
+a polynomial-time solution for problem (24), we propose an
+iterative algorithm that leverages the alternating method.
+
+III. ALGORITHM DESIGN
+
+In this section, we propose an alternating algorithm to
+iteratively solve problem (24) by optimizing six subproblems.
+
+A. Satellite-UAV Computation Task Allocation
+
+With given semantic compression ratio, computation capac-
+ity, power, and bandwidth allocation, altitude, beamwidth, and
+location planning, problem (24) can be simpliﬁed as
+
+min
+aS,aU
+
+K
+(cid:88)
+
+κτ
+
+kOk(ρk)F 2
+aS
+S
+
+k=1
+(cid:80)K
+
+k=1
+
+PS
+
++
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
+rSU
+
++ κτ
+
+K
+(cid:88)
+
+k=1
+
+k Ok(ρk)f 2
+aU
+k
+
++
+
+K
+(cid:88)
+
+pkDk
+
+(cid:2)(cid:0)aS
+
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+k=1
+
+rk
+
+,
+
+(25)
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+rSU
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+dSU
+c
+
+kOk(ρk)
+
+κ (cid:80)K
+
+k=1 aS
+FS
+
+(cid:80)K
+
+k=1
+
++
+
++
+
+κaU
+
+k Ok(ρk)
+fk
+(cid:0)aS
+k + aU
+k
+
++ Dk
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+k − aU
+k
+
+(cid:1)
+
+≤ T,
+
+∀k ∈ K,
+
+(25a)
+
+(25b)
+
+(25c)
+
+k + aU
+aS
+k, aU
+aS
+
+k ≤ 1,
+k ∈ {0, 1} ,
+
+∀k ∈ K,
+
+∀k ∈ K.
+
+The difﬁculty in solving problem (25) arises from the discrete
+nature of the value space for aS and aU. This characteristic
+transforms problem (25) into a discrete optimization problem,
+whose complexity of ﬁnding the optimal solution is often
+signiﬁcantly high.
+
+To deal with the discrete difﬁculty of problem (25), we ﬁrst
+
+relax the integer constraint (25b) with
+
+k, aU
+aS
+
+k ∈ [0, 1] ,
+
+∀k ∈ K.
+
+(26)
+
+Then, problem (25) becomes a convex optimization problem
+which can be addressed by the dual method.
+
+The dual problem of problem (25) after integer relaxation
+
+(26) can be written as
+
+max
+λ
+
+D (λ) ,
+
+D (λ) =
+
+min
+aS,aU
+s.t.
+
+
+
+
+
+
+L (cid:0)aS, aU, λ(cid:1) ,
+
+aS
+k + aU
+k, aU
+aS
+
+k ≤ 1, ∀k ∈ K,
+k ∈ [0, 1] , ∀k ∈ K,
+
+(27)
+
+(28)
+
+where
+
+with
+
+L (cid:0)aS, aU, λ(cid:1) = κτ
+
+K
+(cid:88)
+
+kOk(ρk)F 2
+aS
+S
+
+k=1
+PS
+
+(cid:80)K
+
+k=1
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
++
+
++
+
++
+
++
+
+rSU
+
+k Ok(ρk)f 2
+aU
+k
+
++ κτ
+
+K
+(cid:88)
+
+k=1
+
+K
+(cid:88)
+
+k=1
+K
+(cid:88)
+
+pkDk
+
+(cid:0)aS
+
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+k − aU
+k
+
+(cid:1)
+
+(cid:32)
+
+λk
+
+k=1
+(cid:80)K
+
+k=1
+
+(cid:2)aS
+
+κ (cid:80)K
+
+kOk(ρk)
+
+k=1 aS
+FS
+kρkDk + (cid:0)1 − aS
+rSU
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+dSU
+c
+
+κaU
+
+k Ok(ρk)
+fk
+(cid:0)aS
+k + aU
+k
+
++ Dk
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+k − aU
+k
+
+(cid:1)
+
+(cid:33)
+,
+
+− T
+
+(29)
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+and λ = [λ1, · · · , λK] is non-negative Lagrange multiplier
+vector with respect to the corresponding constraint (25a).
+
+The objective function in (28) is linear, we can write the
+k as
+
+coefﬁcient corresponding to aS
+
+AS
+
+k = κτ Ok(ρk)F 2
+
+S − Dk(1 − ρk)
+
++ λk
+
+(cid:20) κOk(ρk)
+FS
+
+− Dk(1 − ρk)
+
++
+
+(cid:18) PS
+rSU
+(cid:18) 1
+rSU
+
+pk
+rk
+
++
+
+(cid:19)
+
+1
+rk
+
+(cid:19)(cid:21)
+
+,
+
+(30)
+
+s.t.
+
+and write the coefﬁcient corresponding to aU
+k as
+pk
+rk
+
+k = κτ Ok(ρk)f 2
+
+k − Dk(1 − ρk)
+
+AU
+
++ λk
+
+− Dk(1 − ρk)
+
+(cid:20) κOk(ρk)
+fk
+k + aU
+
+(cid:21)
+
+.
+
+(31)
+
+1
+rk
+
+Considering constraint aS
+
+k ≤ 1, we can obtain the
+
+optimal solution as
+
+(cid:0)aS
+
+k, aU
+k
+
+(cid:1)∗
+
+=
+
+
+
+
+
+
+(0, 0),
+(0, 1),
+
+if (cid:0)AS
+if (cid:0)AS
+
+(1, 0),
+
+if (cid:0)AS
+
+k ≥ 0 and AU
+k ≥ 0 and AU
+or (cid:0)AU
+k < 0 and AU
+or (cid:0)AS
+
+k ≥ 0(cid:1) ,
+k < 0(cid:1)
+
+k < AS
+
+k < 0(cid:1) ,
+
+(32)
+
+k ≥ 0(cid:1)
+
+k < AU
+
+k < 0(cid:1) ,
+
+The value of λ can be determined by the sub-gradient
+
+method, and the updating process can be given by
+
+(cid:34)
+
+(cid:32)
+
+λk =
+
+λk + ξ
+
+κ (cid:80)K
+
+kOk(ρk)
+
+k=1 aS
+FS
+kρkDk + (cid:0)1 − aS
+rSU
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+dSU
+c
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+k − aU
+k
+
+(cid:1)
+
+(cid:33)(cid:35)+
+
+− T
+
+,
+
+(33)
+
+k, aU
+k
+
+where [x]+ = max{x, 0}, and ξ > 0 is the dynamic step
+size [42]. By iteratively updating (cid:0)aS
+(cid:1) according to (32)
+and λk according to (33), we can obtain the optimal solution
+of problem (25) with zero duality gap. Note that although
+we relaxed the integer constraint (25c) to be continuous,
+the optimal solution we derived always satisﬁes the discrete
+constraint aS
+k ∈ {0, 1} in accordance with (32). Therefore,
+the integer relaxation does not affect the optimality of problem
+(25).
+
+k, aU
+
+B. Semantic Compression Ratio Optimization
+
+With given satellite-UAV computation task allocation, com-
+putation capacity, power, and bandwidth allocation, altitude,
+beamwidth, and location planning, problem (24) can be sim-
+pliﬁed as
+
+(cid:80)K
+
+k=1
+
+(cid:2)aS
+
++
+
++
+
+κaU
+
+k Ok(ρk)
+fk
+(cid:0)aS
+k + aU
+k
+
++ Dk
+
+8821
+
+,
+
+(34)
+
+K
+(cid:88)
+
+pkDk
+
+(cid:2)(cid:0)aS
+
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+rk
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+rSU
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+dSU
+c
+
++ κτ
+
+K
+(cid:88)
+
+k=1
+
+k Ok(ρk)f 2
+aU
+k
+
+kOk(ρk)
+
++
+
+k=1
+κ (cid:80)K
+
+k=1 aS
+FS
+
+(cid:80)K
+
+k=1
+
++
+
++
+
+κaU
+
+k Ok(ρk)
+fk
+(cid:0)aS
+k + aU
+k
+
++ Dk
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+k − aU
+k
+
+(cid:1)
+
+≤ T,
+
+∀k ∈ K,
+
+(34a)
+
+(34b)
+
+ρmin
+k ≤ ρk ≤ 1,
+
+∀k ∈ K.
+
+The difﬁculty in solving problem (34) lies in the piecewise
+function Ok(ρk), which leads to non-smooth optimization.
+
+To address this difﬁculty, we suggest using the binary
+variable αkd ∈ {0, 1} to signify the linear segment level of
+Ok(ρk). When αkd = 1, the computation overhead function
+Ok(ρk) is associated with the d-th segment. Thus, it can
+be represented as Ok(ρk) = Akdρk + Bkd. Conversely, if
+αkd = 0, the computation overhead function does not pertain
+to the d-th segment. By introducing the binary variable αkd,
+we can rewrite the computation overhead function as
+
+Ok(ρk) =
+
+D
+(cid:88)
+
+d=1
+
+αkd (Akdρk + Bkd) ,
+
+(35)
+
+where D represents the total number of segments of the
+piecewise function. Furthermore, we have
+
+D
+(cid:88)
+
+d=1
+
+αkd = 1, αkd ∈ {0, 1},
+
+(36)
+
+since each GT corresponds to only one linear segment level.
+After the above reformulation, we ﬁrst aim to roughly
+determine the segment of the piecewise function. To achieve
+this, we use the midpoint of each segment d to approximate
+the value of this segment, which can be given by
+
+ρkd =
+
+Ckd + Ck(d−1)
+2
+with Ck0 = 1, ∀k ∈ K.
+
+,
+
+∀d ∈ Ds, ∀k ∈ K,
+
+(37)
+
+Then, the segment selection problem is
+
+min
+α
+
+K
+(cid:88)
+
+D
+(cid:88)
+
+κτ F 2
+S
+
+aS
+kαkd (Akdρkd + Bkd)
+
+k=1
+d=1
+(cid:80)K
+k=1 Dk
+
+(cid:104)
+
+aS
+k
+
+PS
+
++
+
+(cid:16)(cid:80)D
+
+d=1 αkdρkd
+rSU
+
+(cid:17)
+
++ (cid:0)1 − aS
+
+k
+
+(cid:1)(cid:105)
+
++ κτ
+
+K
+(cid:88)
+
+D
+(cid:88)
+
+k=1
+
+d=1
+
+k f 2
+aU
+
+k αkd (Akdρkd + Bkd)
+
+min
+ρ
+
+κτ
+
+K
+(cid:88)
+
+k=1
+
+aS
+kOk(ρk)F 2
+S
+
+PS
+
+(cid:80)K
+
+k=1
+
++
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+
+k
+
+rSU
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+K
+(cid:88)
+
+k=1
+
+pkDk
+
+1 − aS
+
+k − aU
+
+k + (cid:0)aS
+
+k + aU
+k
+rk
+
+(cid:1) (cid:80)D
+
+d=1 αkdρkd
+
+,
+
+(38)
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+≤ T,
+
+ment indicator α.
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+8822
+
+s.t.
+
+κ (cid:80)K
+
+k=1
+
+(cid:80)K
+
+k=1 Dk
+
+(cid:104)
+
+(cid:80)D
+
+d=1 aS
+
+kαkd (Akdρkd + Bkd)
+FS
+(cid:16)(cid:80)D
+
+(cid:17)
+
+aS
+k
+
+d=1 αkdρkd
+rSU
+d=1 αkd (Akdρkd + Bkd)
+
+(cid:80)D
+
+κaU
+k
+
++
+
++
+
+fk
+k + (cid:0)aS
+k − aU
+
+1 − aS
+
+k + aU
+k
+rk
+
+(cid:1) (cid:80)D
+
+d=1 αkdρkd
+
++ Dk
+
++ 1 − aS
+k
+
+(cid:105)
+
++
+
+dSU
+c
+
+∀k ∈ K,
+
+D
+(cid:88)
+
+αkd = 1, ∀k ∈ K,
+
+d=1
+αkd ∈ {0, 1}, ∀d ∈ Ds, ∀k ∈ K.
+
+(38a)
+
+(38b)
+
+(38c)
+
+where α
+[αk1;
+
+=
+· · · ; αkD].
+
+[α1, · · · , αk, · · · , αK] with αk
+
+=
+
+The optimal solution to problem (38) can be efﬁciently
+derived using the dual method, which exhibits a zero duality
+gap. The procedure closely resembles the steps employed in
+the ﬁrst subproblem; therefore, a detailed deduction is omitted
+here for brevity.
+
+After solving the segment selection problem, we can deter-
+mine which segment does Ok(ρk) belong to. Denote the
+optimal segment of Ok(ρk) by d∗
+k, we can rewrite problem
+(34) as
+
+min
+ρ
+
+κτ
+
++
+
+K
+(cid:88)
+
+aS
+k
+
+(cid:0)Akd∗
+
+k
+
+ρk + Bkd∗
+
+k
+
+(cid:1) F 2
+
+S
+
+k=1
+PS
+
+(cid:80)K
+
+k=1
+
+(cid:2)aS
+
+kρkDk + (cid:0)1 − aS
+
+k
+
+(cid:1) Dk
+
+(cid:3)
+
+rSU
+
++ κτ
+
+K
+(cid:88)
+
+k=1
+
+aU
+k
+
+(cid:0)Akd∗
+
+k
+
+ρk + Bkd∗
+
+k
+
+(cid:1) f 2
+
+k
+
+K
+(cid:88)
+
+pkDk
+
+(cid:2)(cid:0)aS
+
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+,
+
+(39)
+
+k=1
+κ (cid:80)K
+
+k=1 aS
+k
+
+s.t.
+
++
+
++
+
++
+
+rk
+
+(cid:80)K
+
+k=1
+
+κaU
+k
+
+k
+
+k
+
+k
+
+(cid:1)
+
+(cid:2)aS
+
+ρk + Bkd∗
+
+(cid:0)Akd∗
+FS
+kρkDk + (cid:0)1 − aS
+rSU
+(cid:0)Akd∗
+ρk + Bkd∗
+fk
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+rk
+
+(cid:1)
+
+k
+
+k
+
+(cid:0)aS
+
++ Dk
+
+∀k ∈ K,
+Ckd∗
+
+(cid:1) Dk
+
+(cid:3)
+
++
+
+dSU
+c
+
+k − aU
+k
+
+(cid:1)
+
+≤ T,
+
+(39a)
+
+k
+
+≤ ρk ≤ Ck(d∗
+
+k−1),
+which is a linear optimization problem and can be addressed
+using existing toolbox.
+
+∀k ∈ K,
+
+(39b)
+
+Algorithm 1 provides a summary of the semantic compres-
+
+sion ratio optimization algorithm.
+
+Algorithm 1 Semantic Compression Ratio Optimization
+
+1: Initialize ρ.
+2: Rewrite the computation overhead function according to
+
+(35).
+
+3: Approximate the value of each segment using (37).
+4: Solve problem (38) using dual method, and obtain the
+
+optimal segment indicator α.
+
+5: Reformulate problem (39) according to the obtained seg-
+
+6: Solve problem (39) using existing toolbox.
+7: Output: The optimized ρ.
+
+altitude, beamwidth, and location planning, problem (24) can
+be simpliﬁed as
+
+min
+f
+
+K
+(cid:88)
+
+k=1
+
+k Ok(ρk)f 2
+aU
+k ,
+
+s.t.
+
+tS + tSU +
+
+κaU
+
+k Ok(ρk)
+fk
+
+K
+(cid:88)
+
+fk ≤ FU,
+
+k=1
+fk ≥ 0, ∀k ∈ K.
+
+(40)
+
++ tUG
+
+k ≤ T, ∀k ∈ K,
+
+(40a)
+
+(40b)
+
+(40c)
+
+To solve problem (40), we obtain the following theorem.
+Theorem 1: The optimal solution of problem (40) is
+
+fk =
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+
+, ∀k ∈ K.
+
+(41)
+
+k
+(cid:4)
+Proof: Please refer to Appendix A.
+Theorem 1 demonstrates that the UAV allocates the min-
+imum necessary computation capacity fk to satisfy latency
+constraints, thereby optimizing energy consumption. By exam-
+that fk exhibits
+ining the structure of (41),
+it
+an increasing trend as the latency term diminishes and the
+computation overhead Ok(ρk) escalates, which is consistent
+with intuitive expectations.
+
+is evident
+
+D. Optimal Power and Bandwidth Allocation
+
+With given satellite-UAV computation task allocation,
+semantic compression ratio, computation capacity allocation,
+altitude, beamwidth, and location planning, problem (24) can
+be simpliﬁed as
+
+min
+b,p
+
+s.t.
+
+Dk
+
+k=1
+
+K
+(cid:88)
+
+pkDk
+
+(cid:2)(cid:0)aS
+
+(cid:2)(cid:0)aS
+
+(cid:1) ρk + (cid:0)1 − aS
+k + aU
+k − aU
+k
+k
+(cid:17)
+(cid:16)
+1 + G0gkpk
+bk log2
+Θ2bkN0
+(cid:1) ρk + (cid:0)1 − aS
+k − aU
+k + aU
+k
+k
+(cid:17)
+(cid:16)
+1 + G0gkpk
+bk log2
+Θ2bkN0
+≤ T − tS − tSU − tU
+k ,
+K
+(cid:88)
+
+∀k ∈ K,
+
+(cid:1)(cid:3)
+
+pk ≤ PU,
+
+(cid:1)(cid:3)
+
+,
+
+(42)
+
+(42a)
+
+(42b)
+
+(42c)
+
+C. Optimal Computation Capacity Allocation
+
+With given satellite-UAV computation task allocation,
+semantic compression ratio, power, and bandwidth allocation,
+
+k=1
+K
+(cid:88)
+
+k=1
+
+bk ≤ BU,
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+bk, pk ≥ 0, ∀k ∈ K.
+
+(42d)
+
+It is hard to solve problem (42) due to the non-convexity of
+the objective function. Hence, we ﬁrst try to obtain the optimal
+condition of problem (42) and we have the following lemma.
+Lemma 1: The optimal (b∗, p∗) of problem (42) satisﬁes
+k − aU
+k
+(cid:17)
+
+= T − tS − tSU − tU
+k .
+
+(cid:0)aS
+
+Dk
+
+k + aU
+k
+b∗
+k log2
+
+(cid:1) ρk + 1 − aS
+(cid:16)
+1 + G0gkp∗
+k
+Θ2b∗
+kN0
+
+Proof: Please refer to Appendix B.
+According to lemma 1, we can separate p∗
+(cid:18)
+2
+
+Uk
+b∗
+k − 1
+
+(cid:19)
+
+b∗
+k
+
+k with
+
+p∗
+k =
+
+, ∀k ∈ K,
+
+(44)
+
+Vk
+
+where
+
+Dk
+
+Uk =
+
+(cid:2)(cid:0)aS
+
+k + aU
+k
+
+(cid:1) ρk + (cid:0)1 − aS
+T − tS − tSU − tU
+k
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+,
+
+and
+
+G0gk
+Θ2N0
+are both constants in problem (42).
+
+Vk =
+
+,
+
+Then, problem (42) can be reformulated as
+
+K
+(cid:88)
+
+k=1
+
+T − tS − tSU − tU
+k
+Vk
+
+(cid:18)
+
+bk
+
+2
+
+(cid:19)
+
+Uk
+bk − 1
+
+,
+
+bk
+
+(cid:18)
+2
+
+Uk
+bk − 1
+
+(cid:19)
+
+≤ PU,
+
+Vk
+
+min
+b
+
+s.t.
+
+K
+(cid:88)
+
+k=1
+K
+(cid:88)
+
+bk ≤ BU,
+
+k=1
+bk ≥ 0,
+
+∀k ∈ K.
+
+(43)
+
+(cid:4)
+
+(45)
+
+(46)
+
+(47)
+
+(47a)
+
+(47b)
+
+(47c)
+
+To solve problem (47), we have the following theorem.
+Theorem 2: Problem (47) is a convex optimization problem.
+(cid:4)
+Proof: Please refer to Appendix C.
+Following theorem 2, problem (47) can be efﬁciently solved
+
+using existing convex optimization toolbox.
+
+E. Optimal Altitude and Beamwidth
+
+With given satellite-UAV computation task allocation,
+semantic compression ratio, computation capacity, power,
+bandwidth allocation, and location planning, problem (24) can
+be simpliﬁed as
+
+K
+(cid:88)
+
+pkDk
+
+k + aU
+k
+
+(cid:2)(cid:0)aS
+(cid:18)
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+(cid:19) ,
+
+(48)
+
+min
+HU,Θ
+
+Dk
+
+s.t.
+
+k=1
+
+bk log2
+(cid:2)(cid:0)aS
+k + aU
+k
+(cid:18)
+
+bk log2
+
+1 +
+
+1 +
+
+Θ2(cid:16)(cid:107)LU−LG
+(cid:1) ρk + (cid:0)1 − aS
+
+G0g0pk
+k (cid:107)2
+k − aU
+k
+
++H 2
+U
+(cid:1)(cid:3)
+
+(cid:17)
+
+bkN0
+
+Θ2(cid:16)(cid:107)LU−LG
+
+G0g0pk
+k (cid:107)2
+k , ∀k ∈ K,
+
++H 2
+U
+
+≤ T − tS − tSU − tU
+(cid:13)
+(cid:13)
+(cid:13)LU − LG
+(cid:13) ≤ HU tan Θ, ∀k ∈ K,
+k
+
+(cid:19)
+
+(cid:17)
+
+bkN0
+
+H min
+U ≤ HU ≤ H max
+U ,
+Θmin ≤ Θ ≤ Θmax.
+
+8823
+
+(48c)
+
+(48d)
+
+We observe that the objective function of problem (48)
+and the left hand side of constraint (48a) are both increasing
+functions in HU with given Θ. Denote H ∗
+U as the optimal
+value of HU in problem (48), we can claim that
+
+H ∗
+
+U = max
+
+(cid:26)
+
+H min
+U ,
+
+(cid:27)
+
+,
+
+Lmax
+tan Θ
+(cid:13)
+(cid:13). Based on (49), we
+
+(49)
+
+where Lmax = maxk∈K
+consider the following two cases.
+
+(cid:13)
+(cid:13)LU − LG
+k
+
+1) Case 1: If H ∗
+
+U = H min
+
+U , problem (48) is equivalent to
+
+min
+Θ
+
+s.t.
+
+Θ,
+
+Dk
+
+k + aU
+k
+
+(cid:2)(cid:0)aS
+(cid:18)
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+bk log2
+
+1 +
+
+Θ2(cid:104)(cid:107)LU−LG
+
+G0g0pk
+k (cid:107)2
+
++(Hmin
+
+U )2(cid:105)
+
+bkN0
+
+≤ T − tS − tSU − tU
+k ,
+Lmax ≤ H min
+U tan Θ,
+Θmin ≤ Θ ≤ Θmax.
+
+∀k ∈ K,
+
+(50)
+
+(cid:19)
+
+(50a)
+
+(50b)
+
+(50c)
+
+Obviously, the optimal solution of problem (50) is
+(cid:26)
+
+(cid:27)
+
+Θ∗ = max
+
+Θmin, arctan
+
+,
+
+(51)
+
+Lmax
+H min
+U
+
+which is the minimal value of Θ satisfying constraints (50b)
+and (50c). Considering constraint (50a), problem (50) is fea-
+sible if and only if
+
+(cid:40)
+
+(cid:115)
+
+Θ∗ ≤ min
+
+Θmax, min
+k∈K
+
+G0g0pk
+IkbkN0 (2Jk − 1)
+
+(cid:41)
+
+,
+
+(52)
+
+where
+Dk[(aS
+
+Ik = (cid:13)
+(cid:13)LU − LG
+k
+k )]
+k )ρk+(1−aS
+k−aU
+k+aU
+bk(T −tS−tSU−tU
+k )
+
+solution.
+
+(cid:13)
+2
+(cid:13)
+
++ (cid:0)H min
+
+U
+
+(cid:1)2
+
+and Jk =
+
+. Otherwise, problem (50) has no
+
+U ≥ Lmax
+
+2) Case 2: If H min
+
+tan Θ∗ , then the optimal solution
+of case 1 is the optimal solution of problem (48). Otherwise,
+H ∗
+tan Θ . In this case, problem (48) is equivalent to
+(cid:1)(cid:3)
+
+U = Lmax
+K
+(cid:88)
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+k + aU
+k
+
+(cid:2)(cid:0)aS
+pkDk
+(cid:18)
+
+min
+Θ
+
+k=1
+
+bk log2
+
+1 +
+
+Θ2(cid:104)(cid:107)LU−LG
+
+G0g0pk
+k (cid:107)2
+
++( Lmax
+
+tan Θ )2(cid:105)
+
+s.t.
+
+Dk
+
+k + aU
+k
+
+(cid:2)(cid:0)aS
+(cid:18)
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+
+bk log2
+
+1 +
+
+Θ2(cid:104)(cid:107)LU−LG
+
+G0g0pk
+k (cid:107)2
+
++( Lmax
+
+tan Θ )2(cid:105)
+
+bkN0
+
+∀k ∈ K,
+
+≤ T − tS − tSU − tU
+k ,
+Lmax
+tan Θ
+
+U ≤
+
+H min
+
+≤ H max
+U ,
+
+Θmin ≤ Θ ≤ Θmax.
+
+(cid:19) ,
+
+bkN0
+
+(53)
+
+(cid:19)
+
+(53a)
+
+(53b)
+
+(53c)
+
+It is generally hard to obtain the optimal solution of problem
+(53) in closed form due to its complicated objective function.
+Hence, we conduct one-dimensional exhaustive search over
+[Θmin, Θmax] to obtain the optimal Θ∗.
+
+(48a)
+
+(48b)
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8824
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+Comparing the optimal solution of the above two cases,
+the one with lower objective value is the optimal solution of
+problem (48).
+
+F. Optimal Location Planning
+
+With given satellite-UAV computation task allocation,
+semantic compression ratio, computation capacity, power,
+bandwidth allocation, altitude, and beamwidth, problem (24)
+can be simpliﬁed as
+
+TABLE II
+
+MAIN SYSTEM PARAMETERS
+
+min
+LU
+
+s.t.
+
+K
+(cid:88)
+
+pkDk
+
+k + aU
+k
+
+(cid:2)(cid:0)aS
+(cid:18)
+
+(cid:1) ρk + (cid:0)1 − aS
+
+k − aU
+k
+
+(cid:1)(cid:3)
+(cid:19) ,
+
+(54)
+
+k=1
+
+Dk
+
+bk log2
+(cid:2)(cid:0)aS
+k + aU
+k
+(cid:18)
+
+bk log2
+
+1 +
+
+1 +
+
+Θ2(cid:16)(cid:107)LU−LG
+(cid:1) ρk + (cid:0)1 − aS
+
+(cid:17)
+
+G0g0pk
+k (cid:107)2
++H 2
+U
+(cid:1)(cid:3)
+k − aU
+k
+
+Θ2(cid:16)(cid:107)LU−LG
+
+(cid:17)
+
+G0g0pk
+k (cid:107)2
+∀k ∈ K,
+
++H 2
+U
+
+bkN0
+
+bkN0
+
+(cid:19)
+
+≤ T − tS − tSU − tU
+k ,
+(cid:13)
+(cid:13)
+(cid:13)LU − LG
+(cid:13) ≤ HU tan Θ,
+k
+
+∀k ∈ K.
+
+(54a)
+
+(54b)
+
+Constraint (54a) is equivalent to
+
+(cid:13)
+(cid:13)LU − LG
+k
+
+(cid:13)
+(cid:13) ≤
+
+(cid:115)
+
+G0g0pk
+Θ2bkN0 (2Jk − 1)
+
+− H 2
+U,
+
+∀k ∈ K.
+
+(55)
+
+Denote the right-hand side of (55) by Qk, then we can combine
+constraints (54a) and (54b) as
+(cid:13)
+(cid:13) ≤ min {HU tan Θ, Qk} ,
+
+(cid:13)
+(cid:13)LU − LG
+k
+
+∀k ∈ K.
+
+(56)
+
+(cid:13)LU − LG
+k
+
+Since (cid:13)
+(cid:13)
+(cid:13) represents the horizontal distance between
+the UAV and GT k, the feasible region for GT k is a circular
+area of radius min {HU tan Θ, Qk} with center LG
+k . Denote
+the feasible region for GT k by Rk, we can express the feasible
+region of problem (54) as
+
+RU =
+
+(cid:92)
+
+k∈K
+
+Rk.
+
+(57)
+
+Then, we conduct two-dimensional exhaustive search over
+RU to obtain the optimal LU with the lowest objective value
+of problem (54).
+
+G. Algorithm Analysis
+
+The overall SAGIN-enabled PSCom network energy mini-
+
+mization algorithm solve the six subproblems iteratively.
+
+1) Convergence Analysis: Denote the objective value of
+obj, and the objective value
+s1 , etc.
+
+problem (24) at i-th iteration by V (i)
+at i-th iteration after solving the ﬁrst subproblem by V (i)
+We have
+
+V (i−1)
+obj ≥ V (i)
+≥ V (i)
+
+s1 ≥ V (i)
+s4 ≥ V (i)
+
+s2 ≥ V (i)
+s5 ≥ V (i)
+
+s3
+
+s6 = V (i)
+obj,
+
+(58)
+
+which means the objective value of problem (24) is non-
+increasing along the iteration. Moreover, the physical meaning
+of the objective value is energy consumption, which is always
+positive. Since the objective value is non-increasing during the
+iteration and is lower-bounded by zero, the proposed iterative
+algorithm must converge.
+
+1 M2
+
+2) Complexity Analysis: The complexity of solving prob-
+lem (24) lies in solving six subproblems at each iteration.
+For the satellite-UAV computation task allocation subproblem,
+the complexity is O (N1K), where N1 is the number of
+iterations of using the dual method to solve problem (25).
+For the semantic compression ratio optimization subproblem,
+the complexity lies in the segment selection problem and
+the subsequent convex problem. For the segment selection
+the complexity is O (N2KD), where N2 is the
+problem,
+number of iterations of using the dual method to solve problem
+(38). For the subsequent convex problem,
+the complexity
+(cid:1) [43], where M1 = K is the number of
+is O (cid:0)M 2
+variables, and M2 = 2K is the number of constraints in
+problem (39). As a result, the total complexity of solving
+the semantic compression ratio optimization subproblem is
+O (cid:0)N2KD + K 3(cid:1). For the optimal computation capacity allo-
+cation subproblem, the complexity is O (K). For the optimal
+power and bandwidth allocation subproblem, the complexity
+is O (cid:0)K 3(cid:1). For the optimal optimal altitude and beamwidth
+subproblem, the complexity is O ((Θmax − Θmin) /η), where
+η is the step size of one-dimensional exhaustive search of
+problem (53). For the optimal location planning subproblem,
+the complexity is O (N3), where N3 is the number of steps
+of two-dimensional exhaustive search of problem (54). As
+a result, the total complexity of the proposed algorithm is
+O(N N1K+N N2KD+N K 3+N (Θmax − Θmin) /η+N N3),
+where N is the number of outer iterations.
+
+IV. SIMULATION RESULTS AND ANALYSIS
+
+In the simulations, the GTs are uniformly distributed within
+a circular area of radius 300 m. We assume that each GT
+requires the same amount of data. For the PSCom model, we
+adopt the same parameters as in [33]. A summary of the main
+system parameters is provided in Table II.
+
+Fig. 6 demonstrates the convergence behavior of
+the
+proposed algorithm under varying satellite computation capac-
+ities. The results indicate that the algorithm converges rapidly,
+requiring only three iterations to achieve stability, which
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8825
+
+COMPUTATION TASK ALLOCATION WITH DIFFERENT NUMBERS OF GTS
+
+TABLE III
+
+Fig. 6. Convergence behavior of the proposed algorithm.
+
+Fig. 8. Total energy consumption vs. satellite beam gain.
+
+the PSCom technique, which effectively compresses the orig-
+inal data and reduces communication energy costs. Although
+semantic compression incurs additional computation overhead,
+the energy savings from reduced data transmission outweigh
+the computational energy expenditure, particularly when an
+optimized semantic compression ratio is applied. Furthermore,
+the ‘Random comp. allocation’ scheme consumes more energy
+than both the ‘Comp. only at satellite’ and ‘SAGIN-PSCom’
+schemes, which exhibit identical performance. This suggests
+that, under
+the ‘SAGIN-
+the current simulation settings,
+PSCom’ scheme also allocates all computation tasks to the
+satellite. However,
+this strategy is not necessarily optimal
+under all conditions. To further analyze the impact of compu-
+tation task allocation, Table III examines how the distribution
+of computation tasks between the satellite and the UAV varies
+with different numbers of GTs.
+
+In Table III, when the number of GTs is 7, we conﬁgure one
+GT to require less data compared to the others. In this case,
+the proposed algorithm assigns the computation task of this
+GT to the UAV, rather than allocating all computation tasks to
+the satellite. This result demonstrates that the algorithm can
+dynamically adapt computation task allocation based on the
+heterogeneous data demands of each GT, ensuring an efﬁcient
+balance between communication and computation resources.
+Fig. 8 demonstrates that the ‘SAGIN-PSCom’ scheme’s
+beneﬁts are particularly pronounced under conditions of low
+satellite beam gain. This occurs because a decrease in satellite
+beam gain diminishes the achievable rate between the satel-
+lite and the UAV, thereby increasing the energy required to
+transmit the same amount of data. Under these conditions,
+the ‘SAGIN-PSCom’ scheme compensates by allocating more
+
+Fig. 7. Total energy consumption vs. data size.
+
+underscores the effectiveness of our optimization algorithm.
+Initially, the energy consumption is high because communica-
+tion and computation resources are equally allocated to each
+GT. However, after several iterations, the energy consumption
+signiﬁcantly decreases, as the proposed algorithm effectively
+optimizes these system parameters.
+
+To compare the results of the proposed algorithm, labeled
+as ‘SAGIN-PSCom’, we consider ﬁve alternative schemes:
+the ‘Non-semantic’ scheme, which employs no semantic
+compression; the ‘Random comp. allocation’ scheme, where
+computation tasks are randomly allocated between the satellite
+and the UAV; the ‘Comp. only at satellite’ scheme, which only
+allocates computation tasks to the satellite; the ‘Simpliﬁed
+PSCom’ scheme, where conditional probabilities are not used
+for semantic compression; and the ‘Fix UAV location’ scheme,
+which excludes optimization of the UAV’s location.
+
+Fig. 7 illustrates the relationship between total energy
+consumption and the original data size. As expected, increas-
+ing the data size results in a corresponding rise in energy
+consumption across all four examined schemes. Notably, the
+proposed ‘SAGIN-PSCom’ scheme consistently achieves the
+lowest total energy consumption, primarily due to its use of
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8826
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+UAV location is not at the origin but slightly offset. Given that
+the UAV communication energy is quantiﬁed on the order of
+10−3, it constitutes a minor fraction of the total system energy
+consumption. This minor impact supports the observation that
+the ‘Fix UAV location’ scheme performs comparably to the
+‘SAGIN-PSCom’ scheme.
+
+V. CONCLUSION
+
+This paper has investigated the problem of energy efﬁciency
+in SAGIN-enabled PSCom system. The model considers that a
+satellite transmits data to multiple GTs through a UAV acting
+as a relay. The satellite and the UAV can use PSCom technique
+to compress the transmitted data, while the GTs can automat-
+ically recover missing information. The PSCom is enabled by
+shared probabilistic graphs among the transceivers, allowing
+for the conservation of communication resource at the expense
+of additional computation resource. The joint communication
+and computation problem is formulated as an optimization
+problem aiming to minimize the total communication and
+computation energy consumption of the network under latency,
+power, computation capacity, bandwidth, semantic compres-
+sion ratio, and UAV location constraints. We proposed an
+iterative algorithm to solve this non-convex non-smooth prob-
+lem, where the closed-form solutions for computation capacity
+allocation and UAV altitude are obtained at each iteration.
+Numerical results demonstrate the effectiveness of the pro-
+posed algorithm.
+
+In future research, we plan to expand our scenario to include
+multiple satellites and UAVs. In addition, we plan to consider
+the dynamic elements of satellite motion and the trajectory of
+the UAV to improve the robustness and adaptability of our
+energy-efﬁcient communication framework.
+
+APPENDIX A
+PROOF OF THEOREM 1
+
+For those GTs with aU
+
+k = 0, we can simply set fk = 0
+because the UAV does not need to compute for these GTs.
+For other GTs with aU
+k = 1, we can combine constraints (40a)
+and (40c) as
+
+fk ≥
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+
+k
+
+> 0, ∀k ∈ K,
+
+(59)
+
+where
+
+κaU
+
+k Ok(ρk)
+
+T −tS−tSU−tUG
+
+k
+
+is a constant in problem (40).
+
+Then, the Lagrange function of problem (40) can be given
+
+by
+
+L (f , µ1, µ2) =
+
+K
+(cid:88)
+
+k=1
+
+k Ok(ρk)f 2
+aU
+k
+
+K
+(cid:88)
+
+−
+
+(cid:18)
+
+µ1k
+
+fk −
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+(cid:33)
+
+k
+
+(cid:19)
+
+(60)
+
+k=1
+
+(cid:32) K
+(cid:88)
+
++ µ2
+
+fk−FU
+
+,
+
+k=1
+
+where µ1 = [µ11, · · · , µ1K] is the non-negative Lagrange
+multiplier vector associated with constraint (59), and µ2 is the
+
+Fig. 9. Total energy consumption vs. satellite-UAV distance.
+
+Fig. 10. The impact of UAV’s location on UAV communication energy.
+
+computation resources at the satellite to mitigate the adverse
+effects of reduced beam gain. Furthermore, the performance
+of the ‘Simpliﬁed PSCom’ scheme falls between that of the
+‘Non-semantic’ and ‘SAGIN-PSCom’ schemes, highlighting
+the advantage of leveraging deeper probabilistic information.
+Fig. 9 depicts the relationship between total energy con-
+sumption and the distance between the satellite and UAV.
+Interestingly, the ‘Fix UAV location’ scheme exhibits energy
+consumption levels comparable to those of
+the SAGIN-
+PSCom’ scheme, suggesting that the UAV’s location does not
+critically impact the system’s overall energy efﬁciency. This
+observation also indicates that the energy used for communi-
+cation between the UAV and GTs is relatively minor within
+the system’s total energy consumption.
+
+In Fig. 10, the inﬂuence of UAV’s location on its com-
+munication energy is explored. The axes represent the UAV’s
+two-dimensional coordinates in meters, and the color gradient
+illustrates varying values of the objective function deﬁned in
+Section III-F, which is the communication energy consumed
+by the UAV. Fig. 10 is obtained when the 4 GTs requiring
+different amount of data. The ﬁgure reveals that the optimal
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8827
+
+non-negative Lagrange multiplier associated with constraint
+(40b). The ﬁrst derivative of (60) is
+
+APPENDIX C
+PROOF OF THEOREM 2
+
+∂L (f , µ1, µ2)
+∂fk
+
+= 2aU
+
+k Ok(ρk)fk − µ1k + µ2.
+
+(61)
+
+Deﬁne function
+
+q(x) = x (cid:0)2
+
+a
+
+x − 1(cid:1) , x > 0,
+
+(70)
+
+Setting ∂L(f ,µ1,µ2)
+
+∂fk
+
+= 0 yields
+
+fk =
+
+µ1k − µ2
+2aU
+k Ok(ρk)
+
+.
+
+According to complementary slackness, we have
+
+(cid:18)
+
+µ1k
+
+fk −
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+
+k
+
+(cid:19)
+
+= 0.
+
+(63)
+
+To obtain the Karush-Kuhn-Tucker (KKT) point, conditions
+(62) and (63) must be satisﬁed at the same time. Moreover,
+due to the fact that fk > 0 and µ1k, µ2 are non-negative, µ1k
+must be greater than zero, which means
+
+where a is a positive constant. Then, we can write its derivative
+as
+
+a(ln 2)2 a
+x
+
+x
+
+, x > 0.
+
+(71)
+
+(62)
+
+q(cid:48)(x) = 2
+
+a
+x − 1 −
+
+Furthermore,
+
+x
+
+, x > 0.
+
+q(cid:48)(cid:48)(x) =
+
+a2(ln 2)22 a
+x3
+Obviously, q(cid:48)(cid:48)(x) > 0 on x > 0. Thus, q(x) is a convex
+function. Therefore, the objective function of problem (47) and
+constraint (47a) are both convex. Since constraints (47b) and
+(47c) are also convex, problem (47) is a convex optimization
+problem.
+
+(72)
+
+fk −
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+
+k
+
+= 0,
+
+(64)
+
+REFERENCES
+
+for those GTs with aU
+fk = 0 for those GTs with aU
+closed-form solution of problem (40) as
+
+k = 1. As mentioned above, we set
+k = 0. Hence, we can obtain the
+
+fk =
+
+κaU
+
+k Ok(ρk)
+T − tS − tSU − tUG
+
+k
+
+, ∀k ∈ K.
+
+(65)
+
+APPENDIX B
+PROOF OF LEMMA 1
+
+Lemma 1 can be proved by the contradiction method. Deﬁne
+
+function
+
+f (x) =
+
+x
+log2(1 + x)
+
+, x > 0,
+
+(66)
+
+whose derivative is
+
+f (cid:48)(x) =
+
+(ln 2) (1 + x) log2(1 + x) − x
+(ln 2) [log2(1 + x)]2 (1 + x)
+
+, x > 0.
+
+(67)
+
+Then, deﬁne function
+
+g(x) = (ln 2) (1 + x) log2(1 + x) − x, x > 0,
+
+(68)
+
+whose derivative is
+
+g(cid:48)(x) = (ln 2) log2(1 + x), x > 0.
+
+(69)
+
+Obviously, g(cid:48)(x) > 0 for x > 0. Since g(0) = 0, we have
+g(x) > 0 for x > 0. Furthermore, since the denominator of
+f (cid:48)(x) is greater than zero for x > 0, we have f (cid:48)(x) > 0 for
+x > 0. Thus, f (x) is monotonically increasing on x > 0.
+Hence, with given bk, the objective function of problem (42)
+increases with growing pk.
+
+Assume (b, p) is a feasible solution of problem (42), if
+there exists one k whose corresponding constraint (42a) holds
+with inequality, we can always decrease pk to obtain a smaller
+objective value. Therefore, for optimal (b∗, p∗), constraint
+(42a) must hold with equality.
+
+[1] W. Mei, Q. Wu, and R. Zhang, “Cellular-connected UAV: Uplink
+association, power control and interference coordination,” IEEE Trans.
+Wireless Commun., vol. 18, no. 11, pp. 5380–5393, Nov. 2019.
+S. Zhang et al., “Large models for aerial edges: An edge-cloud model
+evolution and communication paradigm,” IEEE J. Sel. Areas Commun.,
+vol. 43, no. 1, pp. 21–35, Jan. 2025.
+
+[2]
+
+[4]
+
+[3] W. Mei and R. Zhang, “Aerial-ground interference mitigation for
+cellular-connected UAV,” IEEE Wireless Commun., vol. 28, no. 1,
+pp. 167–173, Feb. 2021.
+J. Liu, Y. Shi, Z. M. Fadlullah, and N. Kato, “Space-air-ground integrated
+network: A survey,” IEEE Commun. Surveys Tuts., vol. 20, no. 4,
+pp. 2714–2741, 4th Quart., 2018.
+J. Ye, S. Dang, B. Shihada, and M.-S. Alouini, “Space-air-ground inte-
+grated networks: Outage performance analysis,” IEEE Trans. Wireless
+Commun., vol. 19, no. 12, pp. 7897–7912, Dec. 2020.
+J. Du, T. Lin, C. Jiang, Q. Yang, C. F. Bader, and Z. Han, “Distributed
+foundation models for multi-modal learning in 6G wireless networks,”
+IEEE Wireless Commun., vol. 31, no. 3, pp. 20–30, Jun. 2024.
+
+[5]
+
+[6]
+
+[7] B. Wang et al., “Multi-sources fusion learning for multi-points NLOS
+localization in OFDM system,” IEEE J. Sel. Topics Signal Process.,
+vol. 18, no. 7, pp. 1339–1350, Oct. 2024.
+
+[8] D. G¨und¨uz et al., “Beyond transmitting bits: Context, semantics, and
+task-oriented communications,” IEEE J. Sel. Areas Commun., vol. 41,
+no. 1, pp. 5–41, Jan. 2023.
+
+[9] W. Yang et al., “Semantic communications for future internet: Funda-
+mentals, applications, and challenges,” IEEE Commun. Surveys Tuts.,
+vol. 25, no. 1, pp. 213–250, 1st Quart., 2023.
+
+[10] W. Xu, Z. Yang, D. W. K. Ng, M. Levorato, Y. C. Eldar, and M. Debbah,
+“Edge learning for B5G networks with distributed signal processing:
+Semantic communication, edge computing, and wireless sensing,” IEEE
+J. Sel. Topics Signal Process., vol. 17, no. 1, pp. 9–39, Jan. 2023.
+[11] K. Zhou, G. Zhang, Y. Cai, Q. Hu, and G. Yu, “FAST: Feature arrange-
+ment for semantic transmission,” in Proc. IEEE Wireless Commun. Netw.
+Conf. (WCNC), Apr. 2024, pp. 1–6.
+
+[12] Z. Zhao et al., “Energy efﬁcient probabilistic semantic communication
+over SAGIN,” in Proc. IEEE Global Commun. Conf. (GLOBECOM),
+Dec. 2024, pp. 5072–5077.
+
+[13] G. Zheng, Q. Ni, K. Navaie, and H. Pervaiz, “Semantic communication
+in satellite-borne edge cloud network for computation ofﬂoading,” IEEE
+J. Sel. Areas Commun., vol. 42, no. 5, pp. 1145–1158, May 2024.
+[14] Y. Sun et al., “Multi-functional RIS-assisted semantic anti-jamming
+communication and computing in integrated aerial-ground networks,”
+IEEE J. Sel. Areas Commun., vol. 42, no. 12, pp. 3597–3617, Dec. 2024.
+[15] H. Cui et al., “Space-air-ground integrated network (SAGIN) for 6G:
+Requirements, architecture and challenges,” China Commun., vol. 19,
+no. 2, pp. 90–108, Feb. 2022.
+
+[16] C. Chen, Z. Liao, Y. Ju, C. He, K. Yu, and S. Wan, “Hierarchical domain-
+based multicontroller deployment strategy in SDN-enabled space-air-
+ground integrated network,” IEEE Trans. Aerosp. Electron. Syst., vol. 58,
+no. 6, pp. 4864–4879, Dec. 2022.
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+8828
+
+IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, VOL. 24, NO. 10, OCTOBER 2025
+
+[17] Y. Zhang, J. Wang, Q. Li, J. Chen, H. Feng, and S. He, “Joint
+communication, sensing, and computing in space–air–ground integrated
+networks: System architecture and handover procedure,” IEEE Veh.
+Technol. Mag., vol. 19, no. 2, pp. 70–78, Jun. 2024.
+
+[18] K. Fan, B. Feng, X. Zhang, and Q. Zhang, “Demand-driven task schedul-
+ing and resource allocation in space-air-ground integrated network: A
+deep reinforcement learning approach,” IEEE Trans. Wireless Commun.,
+vol. 23, no. 10, pp. 13053–13067, Oct. 2024.
+
+[19] B. Cao et al., “Edge-cloud resource scheduling in space-air-ground-
+integrated networks for Internet of Vehicles,” IEEE Internet Things J.,
+vol. 9, no. 8, pp. 5765–5772, Apr. 2022.
+
+[20] P. Zhang, Y. Li, N. Kumar, N. Chen, C.-H. Hsu, and A. Barnawi,
+“Distributed deep reinforcement learning assisted resource allocation
+algorithm for space-air-ground integrated networks,” IEEE Trans. Netw.
+Service Manage., vol. 20, no. 3, pp. 3348–3358, Sep. 2023.
+
+[21] M. Zhang et al., “Beamforming design for semantic-bit coexisting
+communication system,” IEEE J. Sel. Areas Commun., vol. 43, no. 4,
+pp. 1262–1277, Apr. 2025.
+
+[22] Z. Yang, M. Chen, Z. Zhang, and C. Huang, “Energy efﬁcient semantic
+communication over wireless networks with rate splitting,” IEEE J. Sel.
+Areas Commun., vol. 41, no. 5, pp. 1484–1495, May 2023.
+
+[23] Z. Zhao, Z. Yang, M. Chen, Z. Zhang, and H. V. Poor, “A joint
+communication and computation design for probabilistic semantic
+communications,” Entropy, vol. 26, no. 5, p. 394, Apr. 2024.
+
+[24] J. Wang et al., “Generative AI empowered semantic feature multiple
+access (SFMA) over wireless networks,” IEEE Trans. Cogn. Commun.
+Netw., vol. 11, no. 2, pp. 791–804, Apr. 2025.
+
+[25] S. Tang, Q. Yang, L. Fan, X. Lei, A. Nallanathan, and G. K. Kara-
+giannidis, “Contrastive learning-based semantic communications,” IEEE
+Trans. Commun., vol. 72, no. 10, pp. 6328–6343, Oct. 2024.
+
+[26] M. Xu et al., “Generative AI-empowered simulation for autonomous
+driving in vehicular mixed reality metaverses,” IEEE J. Sel. Topics
+Signal Process., vol. 17, no. 5, pp. 1064–1079, Sep. 2023.
+
+[27] K. Zhou, G. Zhang, Y. Cai, Q. Hu, and G. Yu, “Robust model ensembling
+against wireless adversarial attacks for semantic communications,” in
+Proc. IEEE 35th Int. Symp. Pers., Indoor Mobile Radio Commun.
+(PIMRC), Sep. 2024, pp. 1–6.
+
+[28] Z. Qin, F. Gao, B. Lin, X. Tao, G. Liu, and C. Pan, “A generalized
+semantic communication system: From sources to channels,” IEEE
+Wireless Commun., vol. 30, no. 3, pp. 18–26, Jun. 2023.
+
+[29] E. Bourtsoulatze, D. B. Kurka, and D. G¨und¨uz, “Deep joint source-
+channel coding for wireless image transmission,” IEEE Trans. Cogn.
+Commun. Netw., vol. 5, no. 3, pp. 567–579, Sep. 2019.
+
+[30] S. Jiang et al., “Reliable semantic communication system enabled by
+
+knowledge graph,” Entropy, vol. 24, no. 6, p. 846, Jun. 2022.
+
+[31] F. Zhou et al., “Cognitive semantic communication systems driven
+by knowledge graph: Principle,
+implementation, and performance
+evaluation,” IEEE Trans. Commun., vol. 72, no. 1, pp. 193–208, Jan.
+2024.
+
+[32] C. Liu, C. Guo, S. Wang, Y. Li, and D. Hu, “Task-oriented semantic
+communication based on semantic triplets,” in Proc. IEEE Wireless
+Commun. Netw. Conf. (WCNC), Mar. 2023, pp. 1–6.
+
+[33] Z. Zhao et al., “A joint communication and computation design for
+semantic wireless communication with probability graph,” J. Franklin
+Inst., vol. 361, no. 13, Sep. 2024, Art. no. 107055.
+
+[34] R. Xu et al., “Rate-splitting multiple access enabled green proba-
+bilistic semantic communication over wireless networks,” IEEE Trans.
+Green Commun. Netw., early access, Jan. 13, 2025, doi: 10.1109/
+TGCN.2025.3528943.
+
+[35] Z. Zhao et al., “A joint communication and computation design for
+distributed RIS-assisted probabilistic semantic communication in IIoT,”
+IEEE Internet Things J., vol. 11, no. 16, pp. 26568–26579, Aug. 2024.
+[36] C. Huang, G. Chen, P. Xiao, Y. Xiao, Z. Han, and J. A. Chambers,
+“Joint ofﬂoading and resource allocation for hybrid cloud and edge
+computing in SAGINs: A decision assisted hybrid action space deep
+reinforcement learning approach,” IEEE J. Sel. Areas Commun., vol. 42,
+no. 5, pp. 1029–1043, May 2024.
+
+[37] X. Chang, P. Ren, P. Xu, Z. Li, X. Chen, and A. Hauptmann, “A
+comprehensive survey of scene graphs: Generation and application,”
+IEEE Trans. Pattern Anal. Mach. Intell., vol. 45, no. 1, pp. 1–26, Jan.
+2023.
+
+[38] X. Zhu et al., “Multi-modal knowledge graph construction and appli-
+cation: A survey,” IEEE Trans. Knowl. Data Eng., vol. 36, no. 2,
+pp. 715–735, Feb. 2024.
+
+[39] J. Yang et al., “Panoptic video scene graph generation,” in Proc.
+IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR), Vancouver,
+BC, Canada, Jun. 2023, pp. 18675–18685.
+
+[40] Z. Zhao et al., “Compression ratio allocation for probabilistic semantic
+communication with RSMA,” Proc. IEEE Trans. Commun., early access,
+Mar. 6, 2025, doi: 10.1109/TCOMM.2025.3548689.
+
+[41] C. A. Balanis, Antenna Theory: Analysis and Design. New York, NY,
+
+USA: Wiley, 2016.
+
+[42] D. Bertsekas, Convex Optimization Theory. Belmont, MA, USA: Athena
+
+Scientiﬁc, 2009.
+
+[43] M. S. Lobo, L. Vandenberghe, S. Boyd, and H. Lebret, “Applications
+of second-order cone programming,” Linear Algebra Appl., vol. 284,
+nos. 1–3, pp. 193–228, 1998.
+
+Zhouxiang Zhao (Graduate Student Member, IEEE)
+received the B.Eng. degree in information engi-
+neering from Zhejiang University, Hangzhou, China,
+in 2023, where he is currently pursuing the Ph.D.
+degree with the College of Information Science and
+Electronic Engineering, under the supervision of
+Prof. Zhaohui Yang. His research interests include
+semantic communications, graph theory, and joint
+communication and computation. He was a recip-
+ient of the Best Paper Award at IEEE ICC 2024
+Workshop.
+
+IEEE)
+
+Zhaohui Yang (Member,
+received the
+bachelor’s and Ph.D. degrees from Southeast Univer-
+sity, Nanjing, China, in 2014 and 2018, respectively.
+He is currently a ZJU Young Professor with Zhejiang
+Key Laboratory of Information Processing Commu-
+nication and Networking, College of Information
+Science and Electronic Engineering, Zhejiang Uni-
+versity. From 2018 to 2020, he was a Post-Doctoral
+Research Associate with the Center for Telecom-
+munications Research, Department of Informatics,
+King’s College London, U.K. From 2020 to 2022, he
+was a Research Fellow with the Department of Electronic and Electrical Engi-
+neering, University College London, U.K. His research interests include joint
+communication, sensing, and computation, federated learning, and semantic
+communication. He received IEEE Communications Society Asia–Paciﬁc
+Outstanding Young Researcher Award in 2024, IEEE Communications Society
+Leonard G. Abraham Prize Award in 2024, IEEE Computer Society Best Paper
+Award of IEEE Open Journal of the Computer Society in 2024, IEEE Marconi
+Prize Paper Award in 2023, and IEEE Katherine Johnson Young Author
+Paper Award in 2023. He currently serves as an Associate Editor for IEEE
+TRANSACTIONS ON GREEN COMMUNICATIONS AND NETWORKING, IEEE
+COMMUNICATIONS LETTERS, and IEEE TRANSACTIONS ON MACHINE
+LEARNING IN COMMUNICATIONS AND NETWORKING. He has served as a
+Guest Editor for several journals, including IEEE JOURNAL ON SELECTED
+AREAS IN COMMUNICATIONS.
+
+Mingzhe Chen (Senior Member, IEEE) is currently
+an Assistant Professor with the Department of Elec-
+trical and Computer Engineering and the Knight
+Foundation Chair in Data Science and AI with
+the Frost Institute of Data Science and Computing,
+University of Miami. His research interests include
+federated learning, reinforcement learning, virtual
+reality, uncrewed aerial vehicles, and the Internet of
+Things. He has received four IEEE Communication
+Society journal article awards, including the Young
+Author Best Paper Award in 2021 and 2023, and the
+Fred W. Ellersick Prize Award in 2022, and the IEEE Marconi Prize Paper
+Award in Wireless Communications in 2023; and four conference best paper
+awards at IEEE GLOBECOM in 2020, IEEE ICC in 2020, IEEE WCNC
+in 2021, and ICCCN in 2023. He currently serves as an Associate Editor
+for IEEE TRANSACTIONS ON MOBILE COMPUTING, IEEE TRANSACTIONS
+ON COMMUNICATIONS, IEEE WIRELESS COMMUNICATIONS LETTERS,
+IEEE TRANSACTIONS ON GREEN COMMUNICATIONS AND NETWORKING,
+and IEEE TRANSACTIONS ON MACHINE LEARNING IN COMMUNICATIONS
+AND NETWORKING.
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+ZHAO et al.: ENERGY-EFFICIENT PSCom OVER SAGINs
+
+8829
+
+Chen Zhu received the B.Sc. degree from the North
+University of China in 2010 and the M.Sc. degree
+from Zhejiang University of Technology, Hangzhou,
+China, in 2013. He is currently engaged in teaching
+and research with the Polytechnic Institute, Zhe-
+jiang University. His main research interests include
+joint communication, sensing, computation, machine
+learning, semantic communication, and cloud-edge
+collaborative computing.
+
+Zhaoyang Zhang (Senior Member, IEEE) received
+the Ph.D.
+from Zhejiang University,
+Hangzhou, China, in 1998.
+
+degree
+
+He is currently a Qiushi Distinguished Professor
+with Zhejiang University. His research interests
+are mainly focused on the fundamental aspects
+of wireless communications and networking, with
+an emphases on AI-empowered communications
+and networking, integrated communication, sensing
+and computing, and ﬁeld signal processing and
+communication theory. He has co-authored more
+than 150 IEEE journal articles and is a co-recipient of 2024 IEEE Leonard
+G. Abraham Prize and about ten best paper awards or student travel grant
+of international conferences like IEEE ICC 2019, GLOBECOM 2020, ISIT
+2023, and WCNC 2024. He was awarded the National Natural Science Fund
+for Distinguished Young Scholars by NSFC in 2017 and was a co-recipient
+of the First Grade State-Level Teaching Award for Graduate Education in
+2023. He served as an Editor for IEEE TRANSACTIONS ON WIRELESS
+COMMUNICATIONS and IEEE TRANSACTIONS ON COMMUNICATIONS;
+IEEE WIRELESS COMMUNICATIONS Special
+a Lead Guest Editor for
+Issue on Sustainable Big AI Model for Wireless Networks; and as the
+General Chair, the TPC Co-Chair, or the Symposium Co-Chair for WCSP
+2023/2018/2013, PIMRC 2021 Workshop on Native AI Empowered Wireless
+Networks, VTC-Spring 2017 Workshop on HMWC, and Globecom 2014
+Wireless Communications Symposium. He was also a Keynote Speaker of
+IEEE Globecom 2021 Workshop on Native-AI Wireless, APCC 2018, and
+VTC-Fall 2017 Workshop on NOMA.
+
+Wei Xu (Fellow, IEEE) received the B.Sc. degree
+in electrical engineering and the M.S. and Ph.D.
+degrees in communication and information engineer-
+ing from Southeast University, Nanjing, China, in
+2003, 2006, and 2009, respectively.
+
+Between 2009 and 2010, he was a Post-Doctoral
+Research Fellow with the University of Victoria,
+Canada, where he was an Adjunct Professor from
+2017 to 2020 and a Distinguished Visiting Fellow of
+the Royal Academy of Engineering, U.K., in 2019.
+He is currently a Professor with Southeast Univer-
+sity. His research interests include information theory, signal processing, and
+artiﬁcial intelligence for wireless communications. He is a fellow of IET. He
+received the Science and Technology Award for Young Scholars of China
+Institute of Communications in 2018; the Science and Technology Award
+of Chinese Institute of Electronics (Second Prize) in 2019; the National
+Natural Science Foundation of China for Outstanding Young Scholars in 2020;
+the IEEE Communications Society Heinrich Hertz Award in 2023; and the
+Best Paper Awards at IEEE ICC 2024, IEEE Globecom 2014, IEEE ICCC
+2014, ISWCS 2018, and WCSP 2017 and 2021. He served as an Editor
+for IEEE TRANSACTIONS ON COMMUNICATIONS from 2018 to 2023 and
+an Editor and a Senior Editor for IEEE COMMUNICATIONS LETTERS from
+2015 to 2023. He also serving as an Area Editor for IEEE COMMUNICATIONS
+LETTERS and an Associate Editor for IEEE TRANSACTIONS ON VEHICULAR
+TECHNOLOGY.
+
+Kaibin Huang (Fellow, IEEE) received the B.Eng.
+and M.Eng. degrees in electrical engineering from
+the National University of Singapore and the Ph.D.
+degree from The University of Texas at Austin. He
+is currently the Philip K. H. Wong Wilson K. L.
+Wong Professor in electrical engineering and the
+Head of the Department of Electrical and Electronic
+Engineering, The University of Hong Kong (HKU),
+Hong Kong. His work was recognized with seven
+Best Paper Awards from the IEEE Communication
+Society. He is a member of the Engineering Panel
+of Hong Kong Research Grants Council (RGC) and a RGC Research Fellow
+(2021 Class). He has served on the editorial boards of ﬁve major journals in
+the area of wireless communications and co-edited ten journal special issues.
+He has been active in organizing international conferences, such as the 2014,
+2017, and 2023, editions of IEEE Globecom, and a ﬂagship conference in
+communication. He has been named as a Highly Cited Researcher by Clarivate
+in the last six years (2019–2024) and an AI 2000 Most Inﬂuential Scholar (Top
+30 in Internet of Things) in 2023 and 2024. He was an IEEE Distinguished
+Lecturer. He is a fellow of U.S. National Academy of Inventors.
+
+Authorized licensed use limited to: Central South University. Downloaded on March 31,2026 at 13:21:59 UTC from IEEE Xplore.  Restrictions apply. 
+
+

@@ -1,0 +1,68 @@
+constants:
+  tau: 1.0e-9
+  kappa: 1.0e-28
+  speed_of_light: 3.0e8
+  noise_psd: 1.0e-17
+  wavelength_su: 0.1
+  beam_gain_satellite: 16.0
+  g0: 1.0e-3
+  uav_mainlobe_gain: 2.2846
+
+satellite:
+  power: 30.0
+  computation_capacity: 8.0e9
+
+uav:
+  power_budget: 20.0
+  bandwidth: 20.0e6
+  computation_capacity: 4.0e9
+  height_range: [100.0, 500.0]
+  beamwidth_range: [0.10, 0.60]
+
+distance_su: 5.0e5
+sat_bandwidth: 10.0e6
+latency_budget: 0.50
+
+ground_terminals:
+  - x: -100.0
+    y: 0.0
+    data_size: 5.0e5
+    min_compression: 0.2
+    overhead:
+      slopes: [-2.0, -1.0, -0.5]
+      intercepts: [3.0, 2.0, 1.5]
+      boundaries: [0.7, 0.4, 0.2]
+  - x: 100.0
+    y: 0.0
+    data_size: 5.0e5
+    min_compression: 0.2
+    overhead:
+      slopes: [-2.0, -1.0, -0.5]
+      intercepts: [3.0, 2.0, 1.5]
+      boundaries: [0.7, 0.4, 0.2]
+  - x: 0.0
+    y: 150.0
+    data_size: 5.0e5
+    min_compression: 0.2
+    overhead:
+      slopes: [-2.0, -1.0, -0.5]
+      intercepts: [3.0, 2.0, 1.5]
+      boundaries: [0.7, 0.4, 0.2]
+  - x: 0.0
+    y: -150.0
+    data_size: 5.0e5
+    min_compression: 0.2
+    overhead:
+      slopes: [-2.0, -1.0, -0.5]
+      intercepts: [3.0, 2.0, 1.5]
+      boundaries: [0.7, 0.4, 0.2]
+
+simulation:
+  max_outer_iterations: 10  # small 4-GT, moderate-latency setups converge in ~3-5 iters; stops with best-so-far if not converged
+  max_task_allocation_iters: 10
+  max_segment_search_iters: 5
+  beamwidth_step: 0.05
+  location_grid_step: 100.0
+  subgradient_step: 0.1
+  convergence_tol: 1.0e-3
+  verbosity: 1
