@@ -220,12 +220,13 @@ class PSComOptimizer:
                 self.fk[k] = 0.0
                 continue
             remaining = self.scenario.latency_budget - t_s - t_su - self._t_ug(k)
-            if remaining < self.MIN_REMAINING_LATENCY and self.cfg.verbosity:
-                print(
-                    f"[warn] GT{k}: remaining latency is small ({remaining:.2e}), "
-                    "capping to avoid instability."
-                )
-            remaining = max(remaining, self.MIN_REMAINING_LATENCY)
+            if remaining < self.MIN_REMAINING_LATENCY:
+                if self.cfg.verbosity:
+                    print(
+                        f"[warn] GT{k}: remaining latency is small ({remaining:.2e}), "
+                        "capping to avoid instability."
+                    )
+                remaining = max(remaining, self.MIN_REMAINING_LATENCY)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining
         # Normalize to computation budget
         total_f = self.fk.sum()
