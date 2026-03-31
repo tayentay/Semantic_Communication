@@ -7,6 +7,7 @@ This repository contains a lightweight, runnable implementation of the alternati
 - `semantic_comm/`: Python package with data models and optimizer.
 - `config/default.yaml`: Example scenario and algorithm hyperparameters.
 - `run.py`: Entry point to execute the solver.
+- `train_drl.py`: PPO (vwxyzjn/ppo-implementation-details style) trainer over a Gymnasium wrapper of the optimizer.
 
 ## Quickstart
 1) Install dependencies (Python 3.10+ recommended):
@@ -28,6 +29,14 @@ Edit `config/default.yaml` or provide another YAML file. Key fields:
 - `simulation`: Iteration counts, grid/beamwidth steps, and verbosity.
 
 The defaults are illustrative; adjust to match the exact parameters of the target deployment or paper reproductions (e.g., Table II).
+
+## DRL (PPO) training
+- The environment `semantic_comm.envs.SemanticComEnv` exposes the optimizer as a Gymnasium task.
+- Train with PPO adapted from [vwxyzjn/ppo-implementation-details](https://github.com/vwxyzjn/ppo-implementation-details):
+  ```bash
+  python train_drl.py --config config/default.yaml --total-timesteps 20000 --num-envs 2
+  ```
+- Rewards are negative energy with latency and coverage penalties; the trained policy checkpoint is saved under `runs/`.
 
 ## Notes
 - The solver follows the paper’s subproblem structure but uses practical heuristics (e.g., midpoint segment selection, grid search for location, scaled power from the closed-form relation) to remain lightweight and easily configurable.

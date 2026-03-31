@@ -17,6 +17,7 @@ from .models import (
     SimulationConfig,
 )
 from .optimizer import PSComOptimizer
+from .envs import SemanticComEnv
 
 __all__ = [
     "load_config",
@@ -28,4 +29,5 @@ __all__ = [
     "ScenarioParams",
     "SimulationConfig",
     "PSComOptimizer",
+    "SemanticComEnv",
 ]
