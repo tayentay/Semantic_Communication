@@ -18,6 +18,10 @@ class IterationStats:
 
 
 class PSComOptimizer:
+    DEFAULT_COMPRESSION_RATIO = 0.8
+    MIN_RATE = 1e-9
+    MIN_REMAINING_LATENCY = 1e-3
+
     def __init__(self, config: SimulationConfig) -> None:
         self.cfg = config
         self.scenario = config.scenario
@@ -28,7 +32,8 @@ class PSComOptimizer:
         self.a_s = np.ones(self.K)  # semantic compression at satellite
         self.a_u = np.zeros(self.K)  # semantic compression at UAV
         self.eta = np.array(
-            [max(gt.min_compression, 0.8) for gt in self.gts], dtype=float
+            [max(gt.min_compression, self.DEFAULT_COMPRESSION_RATIO) for gt in self.gts],
+            dtype=float,
         )
         self.fk = np.full(self.K, self.scenario.uav.computation_capacity / self.K)
         self.bk = np.full(self.K, self.scenario.uav.bandwidth / self.K)
@@ -41,6 +46,10 @@ class PSComOptimizer:
     # --------------------
     # Utility computations
     # --------------------
+    def _step_size(self, iteration: int) -> float:
+        """Diminishing step size for subgradient updates."""
+        return self.cfg.subgradient_step / math.sqrt(iteration + 1)
+
     def _overhead(self, k: int, eta: float | None = None) -> float:
         return self.gts[k].overhead.value(self.eta[k] if eta is None else eta)
 
@@ -66,7 +75,7 @@ class PSComOptimizer:
         # Coverage check
         coverage_radius = self.hu * math.tan(self.theta)
         if horiz > coverage_radius:
-            return 1e-9  # effectively infeasible
+            return self.MIN_RATE  # effectively infeasible
         gk = const.g0 / (self._distance_uav_gt(k) ** 2)
         numerator = const.uav_mainlobe_gain * gk * self.pk[k]
         denom = (self.theta**2) * self.bk[k] * const.noise_psd
@@ -180,8 +189,7 @@ class PSComOptimizer:
                 t_u = self._t_u(k)
                 t_ug = self._t_ug(k)
                 surplus = t_s + t_su + t_u + t_ug - self.scenario.latency_budget
-                # Diminishing step size follows a standard subgradient schedule.
-                step = self.cfg.subgradient_step / math.sqrt(it + 1)
+                step = self._step_size(it)
                 self.lam[k] = max(self.lam[k] + step * surplus, 0.0)
 
             if np.allclose(a_s_prev, self.a_s) and np.allclose(a_u_prev, self.a_u):
@@ -212,12 +220,12 @@ class PSComOptimizer:
                 self.fk[k] = 0.0
                 continue
             remaining = self.scenario.latency_budget - t_s - t_su - self._t_ug(k)
-            if remaining < 1e-3 and self.cfg.verbosity:
+            if remaining < self.MIN_REMAINING_LATENCY and self.cfg.verbosity:
                 print(
                     f"[warn] GT{k}: remaining latency is small ({remaining:.2e}), "
                     "capping to avoid instability."
                 )
-            remaining = max(remaining, 1e-3)
+            remaining = max(remaining, self.MIN_REMAINING_LATENCY)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining
         # Normalize to computation budget
         total_f = self.fk.sum()

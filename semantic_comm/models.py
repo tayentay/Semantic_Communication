@@ -72,6 +72,7 @@ class SystemConstants:
     wavelength_su: float
     beam_gain_satellite: float
     g0: float
+    # G0 from (10) in the paper: mainlobe gain for the UAV directional antenna.
     uav_mainlobe_gain: float = 2.2846
 
     def __post_init__(self) -> None:
