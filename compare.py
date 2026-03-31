@@ -7,7 +7,8 @@ from typing import Dict, List
 
 import numpy as np
 
-from semantic_comm import PSComOptimizer, load_config
+from semantic_comm.config import load_config
+from semantic_comm.optimizer import PSComOptimizer
 
 
 SCHEMES = ["pscom", "no_semantic", "sat_only", "uav_only", "random"]
