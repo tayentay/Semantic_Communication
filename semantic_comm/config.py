@@ -16,8 +16,13 @@ from .models import (
 
 
 def load_config(path: str | Path) -> SimulationConfig:
-    with open(path, "r", encoding="utf-8") as f:
-        raw = yaml.safe_load(f)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            raw = yaml.safe_load(f)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(f"Config file not found: {path}") from exc
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Failed to parse YAML config {path}: {exc}") from exc
 
     consts = SystemConstants(**raw["constants"])
     sat = SatelliteParams(**raw["satellite"])

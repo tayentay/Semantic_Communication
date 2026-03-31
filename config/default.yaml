@@ -58,7 +58,7 @@ ground_terminals:
       boundaries: [0.7, 0.4, 0.2]
 
 simulation:
-  max_outer_iterations: 10  # typically converges in ~3-5 iterations; 10 provides margin
+  max_outer_iterations: 10  # small 4-GT, moderate-latency setups converge in ~3-5 iters; 10 adds margin
   max_task_allocation_iters: 10
   max_segment_search_iters: 5
   beamwidth_step: 0.05

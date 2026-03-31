@@ -31,7 +31,7 @@ class PiecewiseOverhead:
         return len(self.slopes)
 
     def segment_index(self, eta: float) -> int:
-        """Return segment index d for the provided compression ratio η (1-based)."""
+        """Return 0-based segment index d for the provided compression ratio η."""
         for idx, boundary in enumerate(self.boundaries):
             if eta >= boundary:
                 return idx
@@ -42,7 +42,9 @@ class PiecewiseOverhead:
         return float(self.slopes[d] * eta + self.intercepts[d])
 
     def midpoint(self, d: int) -> float:
-        """Midpoint compression ratio of segment d (0-based)."""
+        """Midpoint compression ratio of segment d (0-based, assumes sorted boundaries)."""
+        if d < 0 or d >= self.segments:
+            raise IndexError("segment index out of range")
         upper = 1.0 if d == 0 else self.boundaries[d - 1]
         lower = self.boundaries[d]
         return 0.5 * (upper + lower)

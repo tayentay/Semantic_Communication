@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -18,7 +19,7 @@ class IterationStats:
 
 
 class PSComOptimizer:
-    DEFAULT_COMPRESSION_RATIO = 0.8
+    DEFAULT_INITIAL_COMPRESSION_RATIO = 0.8
     MIN_RATE = 1e-9
     MIN_REMAINING_LATENCY = 1e-3
 
@@ -27,12 +28,16 @@ class PSComOptimizer:
         self.scenario = config.scenario
         self.K = self.scenario.num_gts
         self.gts: List[GroundTerminal] = self.scenario.gt_positions
+        self.logger = logging.getLogger(__name__)
 
         # Decision variables (initialized with reasonable defaults)
         self.a_s = np.ones(self.K)  # semantic compression at satellite
         self.a_u = np.zeros(self.K)  # semantic compression at UAV
         self.eta = np.array(
-            [max(gt.min_compression, self.DEFAULT_COMPRESSION_RATIO) for gt in self.gts],
+            [
+                max(gt.min_compression, self.DEFAULT_INITIAL_COMPRESSION_RATIO)
+                for gt in self.gts
+            ],
             dtype=float,
         )
         self.fk = np.full(self.K, self.scenario.uav.computation_capacity / self.K)
@@ -47,7 +52,7 @@ class PSComOptimizer:
     # Utility computations
     # --------------------
     def _step_size(self, iteration: int) -> float:
-        """Diminishing step size for subgradient updates."""
+        """Diminishing step size 1/sqrt(iter+1) to avoid div-by-zero at iter=0."""
         return self.cfg.subgradient_step / math.sqrt(iteration + 1)
 
     def _overhead(self, k: int, eta: float | None = None) -> float:
@@ -222,9 +227,10 @@ class PSComOptimizer:
             remaining = self.scenario.latency_budget - t_s - t_su - self._t_ug(k)
             if remaining < self.MIN_REMAINING_LATENCY:
                 if self.cfg.verbosity:
-                    print(
-                        f"[warn] GT{k}: remaining latency is small ({remaining:.2e}), "
-                        "capping to avoid instability."
+                    self.logger.warning(
+                        "GT%s: remaining latency is small (%.2e); capping to avoid instability.",
+                        k,
+                        remaining,
                     )
                 remaining = max(remaining, self.MIN_REMAINING_LATENCY)
             self.fk[k] = const.tau * self.a_u[k] * self._overhead(k) / remaining

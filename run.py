@@ -7,14 +7,15 @@ from semantic_comm import PSComOptimizer, load_config
 
 
 def parse_args() -> argparse.Namespace:
+    base_dir = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(
         description="Run SAGIN-enabled PSCom alternating optimization."
     )
     parser.add_argument(
         "--config",
         type=Path,
-        default=Path("config/default.yaml"),
-        help="Path to YAML configuration file.",
+        default=base_dir / "config" / "default.yaml",
+        help="Path to YAML configuration file (defaults relative to this script).",
     )
     return parser.parse_args()
 
