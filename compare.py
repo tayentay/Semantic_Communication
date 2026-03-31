@@ -51,7 +51,7 @@ def _run_scheme(name: str, cfg, rng: np.random.Generator) -> Dict:
         _freeze_updates(opt, task=True, semantic=True)
         final, history = opt.run()
     elif name == "random":
-        modes = rng.choice(["raw", "sat", "uav"], size=K)
+        modes = rng.choice(["none", "sat", "uav"], size=K)
         a_s = np.zeros(K)
         a_u = np.zeros(K)
         eta = np.zeros(K)
